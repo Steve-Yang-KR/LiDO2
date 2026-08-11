@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>International Digital Twin Platform v2.1 — Multi-Stakeholder Scenario Lab</title>
+<style>
+:root{
+  --bg:#edf3ef;--panel:#fff;--ink:#163029;--muted:#687972;--line:#d9e5dd;
+  --accent:#1c7a55;--accent2:#2e6d7a;--soft:#e8f4ed;--warn:#b77b1d;--danger:#b34f47;
+  --ok:#2c8a62;--shadow:0 12px 30px rgba(22,48,41,.08);--r:18px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:
+radial-gradient(circle at 8% 6%,rgba(28,122,85,.08),transparent 25%),
+radial-gradient(circle at 92% 0%,rgba(46,109,122,.08),transparent 24%),var(--bg);color:var(--ink)}
+button,input,select{font:inherit}
+.app{display:grid;grid-template-columns:238px 1fr;min-height:100vh}
+.sidebar{background:#14362d;color:#fff;padding:20px 14px;position:sticky;top:0;height:100vh}
+.brand small{opacity:.65;text-transform:uppercase;letter-spacing:.12em;font-weight:800}.brand h1{font-size:19px;line-height:1.2;margin:7px 0}.brand p{font-size:12px;line-height:1.45;opacity:.72}
+.nav{display:grid;gap:7px;margin-top:18px}.nav button{border:0;background:transparent;color:#fff;text-align:left;padding:11px 12px;border-radius:11px;cursor:pointer;font-weight:750;opacity:.78}.nav button.active{background:rgba(255,255,255,.14);opacity:1}
+.main{padding:17px 20px 28px;min-width:0}.topbar{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:14px}.topbar h2{margin:0}.topbar p{margin:4px 0 0;color:var(--muted)}
+.rolebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.rolebar select{padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;font-weight:900}
+.view{display:none}.view.active{display:block}.grid{display:grid;gap:13px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+.card h3,.card h4{margin:0 0 8px}.muted{color:var(--muted)}.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:var(--soft);color:#175d42;font-size:11px;font-weight:900}
+.metric{background:#f8fbf9;border:1px solid var(--line);border-radius:14px;padding:13px}.metric small{color:var(--muted)}.metric b{display:block;font-size:23px;margin-top:3px}.metric em{font-style:normal;font-size:12px;color:var(--muted)}
+.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:14px;background:linear-gradient(135deg,#174c3d,#1f7a57 60%,#34737c);color:#fff;border-radius:22px;padding:23px}.hero h2{font-size:37px;line-height:1.05;margin:7px 0}.hero p{opacity:.9;line-height:1.5}
+.hero-side{display:grid;gap:9px}.mini{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:13px;padding:12px}.mini small{display:block;opacity:.72}.mini b{display:block;margin-top:3px}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px}.tabs button{border:1px solid var(--line);background:#fff;padding:8px 11px;border-radius:10px;font-weight:800;cursor:pointer}.tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.matrix-wrap{overflow-x:auto;padding-bottom:5px}.matrix{min-width:1120px;display:grid;grid-template-columns:185px repeat(7,1fr);gap:7px}
+.m-head,.m-side,.m-cell{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}.m-head{font-size:12px;font-weight:900;background:#f4f8f5;text-align:center}.m-side{font-weight:850;background:#f4f8f5;display:flex;align-items:center}.m-cell{min-height:92px;position:relative}.m-cell b{display:block;font-size:12px;margin-bottom:5px}.m-cell span{font-size:11px;color:var(--muted);line-height:1.35}.m-cell .dot{position:absolute;right:8px;top:8px;width:8px;height:8px;border-radius:50%;background:var(--ok)}.m-cell.warn .dot{background:var(--warn)}.m-cell.danger .dot{background:var(--danger)}
+.scenario-layout{display:grid;grid-template-columns:340px 1fr;gap:13px}.control-panel{max-height:780px;overflow:auto}.control-group{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}.control-group:first-of-type{border-top:0;padding-top:0;margin-top:0}.control-group h4{display:flex;justify-content:space-between;align-items:center}.control-row{display:grid;grid-template-columns:1fr 82px;gap:8px;align-items:center;margin:10px 0}.control-row label{font-size:12px;font-weight:800}.control-row output{font-size:12px;text-align:right;color:var(--muted)}input[type=range]{width:100%;accent-color:var(--accent)}
+.presetbar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.presetbar button{border:1px solid var(--line);background:#fff;padding:7px 9px;border-radius:9px;cursor:pointer;font-size:12px;font-weight:800}
+.scene{height:315px;border:1px solid var(--line);border-radius:16px;overflow:hidden;position:relative;background:linear-gradient(180deg,#cfe5ee 0 32%,#dcebd8 32% 100%)}
+.sun{position:absolute;right:8%;top:8%;width:42px;height:42px;border-radius:50%;background:#f5d070;box-shadow:0 0 0 10px rgba(245,208,112,.16)}
+.hills{position:absolute;left:-5%;right:-5%;top:23%;height:100px;background:#9ebaa0;clip-path:polygon(0 70%,15% 25%,28% 62%,44% 10%,59% 56%,75% 18%,100% 68%,100% 100%,0 100%)}
+.rows{position:absolute;inset:42% 4% 7%;display:grid;grid-template-columns:repeat(14,1fr);gap:7px;transform:skewY(-4deg)}.row{background:repeating-linear-gradient(180deg,#2f7b50 0 7px,transparent 7px 16px);border-radius:8px;transition:.3s}
+.sensor{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--accent2);border:3px solid #fff;box-shadow:0 0 0 3px rgba(46,109,122,.2)}.s1{left:18%;top:48%}.s2{left:50%;top:64%}.s3{right:17%;top:50%}
+.floating{position:absolute;background:#fff;border:1px solid var(--line);padding:7px 9px;border-radius:9px;font-size:11px;font-weight:800;box-shadow:var(--shadow)}.f1{left:6%;top:37%}.f2{right:5%;bottom:8%}
+.results{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:11px}.result{padding:11px;border:1px solid var(--line);background:#f8fbf9;border-radius:12px}.result small{color:var(--muted)}.result b{display:block;font-size:20px;margin-top:2px}
+.lifecycle{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-top:10px}.stage{padding:10px;border:1px solid var(--line);border-radius:11px;background:#f8fbf9;min-height:92px;position:relative}.stage b{font-size:12px;display:block}.stage small{font-size:10px;color:var(--muted)}.stage .qbar{height:8px;background:#e4ebe7;border-radius:99px;overflow:hidden;position:absolute;left:9px;right:9px;bottom:9px}.stage .qbar span{display:block;height:100%;background:var(--accent);transition:.3s}
+.notice{padding:12px;border-left:4px solid var(--accent);background:var(--soft);border-radius:10px;margin-top:10px}
+.copilot-chips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 10px}
+.copilot-chips button{border:1px solid var(--line);background:var(--soft);color:#175d42;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:800;cursor:pointer}
+.copilot-chips button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.copilot-hint{font-size:11.5px;color:var(--muted);margin:8px 0 0;line-height:1.6}
+.copilot-hint b{color:var(--ink)}
+.msg.ai .grounding{display:block;margin-top:6px;font-size:10.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:5px}
+.persona-panel{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.persona{padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer}.persona.active{border-color:var(--accent);background:var(--soft)}.persona b{display:block;margin-top:4px}.persona small{color:var(--muted)}
+.copilot{display:grid;grid-template-rows:auto 1fr auto;height:470px}.chat{overflow:auto}.msg{max-width:84%;padding:10px 12px;border-radius:13px;margin:8px 0;line-height:1.45}.msg.ai{background:#f2f7f4;border:1px solid var(--line)}.msg.user{margin-left:auto;background:var(--accent);color:#fff}.chatinput{display:flex;gap:8px}.chatinput input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px}.chatinput button,.primary{border:0;background:var(--accent);color:#fff;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}
+.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);font-size:12px}
+@media(max-width:1100px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:relative}.nav{grid-template-columns:repeat(4,1fr)}.hero,.g2,.g3,.g4,.scenario-layout{grid-template-columns:1fr}.persona-panel{grid-template-columns:1fr 1fr}.results{grid-template-columns:repeat(3,1fr)}.lifecycle{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:680px){.main{padding:11px}.nav{grid-template-columns:1fr 1fr}.topbar{align-items:flex-start;flex-direction:column}.hero h2{font-size:29px}.persona-panel,.results,.lifecycle{grid-template-columns:1fr}}
+
+/* v2.2 dynamic home */
+.home-command{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;background:linear-gradient(135deg,#174c3d,#1f7a57 58%,#34737c);color:#fff;border-radius:22px;padding:22px;overflow:hidden}
+.command-copy{align-self:center}.command-copy h2{font-size:36px;line-height:1.08;margin:9px 0 7px}.command-copy p{margin:0;opacity:.88;max-width:760px}
+.home-search{display:flex;gap:8px;margin-top:16px}.home-search input{flex:1;min-width:0;border:0;border-radius:12px;padding:13px}.home-search button{border:0;border-radius:12px;padding:12px 17px;background:#fff;color:var(--ink);font-weight:900;cursor:pointer}
+.quick-prompts{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.quick-prompts button{border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.09);color:#fff;padding:7px 10px;border-radius:999px;font-size:12px;cursor:pointer}
+.live-orbit{position:relative;min-height:285px}.orbit-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:126px;height:126px;border-radius:50%;display:grid;place-content:center;text-align:center;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);box-shadow:0 0 0 26px rgba(255,255,255,.035),0 0 0 52px rgba(255,255,255,.018)}
+.orbit-center span,.orbit-center small{font-size:11px;opacity:.75}.orbit-center b{font-size:20px;letter-spacing:.08em}
+.orbit-item{position:absolute;width:112px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;border-radius:15px;padding:10px;text-align:left;cursor:pointer;backdrop-filter:blur(4px);transition:.2s}
+.orbit-item:hover{background:rgba(255,255,255,.18);transform:translateY(-2px)}.orbit-item span{font-size:22px}.orbit-item b,.orbit-item small{display:block}.orbit-item b{font-size:12px}.orbit-item small{font-size:10px;opacity:.72}.oi1{left:4%;top:7%}.oi2{right:1%;top:15%}.oi3{left:8%;bottom:4%}.oi4{right:4%;bottom:2%}
+.home-live-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:13px;margin-top:13px}.section-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.section-head h3{margin-bottom:3px}.section-head p{margin:0}.live-dot{font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:center}.live-dot span{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 5px rgba(44,138,98,.12)}
+.home-scene{height:300px;margin-top:8px}.weather-strip{position:absolute;left:4%;right:4%;bottom:5%;display:flex;gap:7px;justify-content:center;flex-wrap:wrap}.weather-strip span{background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:999px;padding:5px 8px;font-size:10px;font-weight:800}
+.signal-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}.signal-chip{padding:9px;border:1px solid var(--line);border-radius:11px;background:#f8fbf9}.signal-chip small,.signal-chip b{display:block}.signal-chip small{font-size:10px;color:var(--muted)}.signal-chip b{font-size:14px}
+.pulse{animation:pulse 1.7s infinite}.pulse.delay{animation-delay:.45s}.pulse.delay2{animation-delay:.9s}@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(46,109,122,.18)}50%{box-shadow:0 0 0 10px rgba(46,109,122,.03)}}
+.icon-button,.text-button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 9px;cursor:pointer}.text-button{font-size:11px;font-weight:800}
+.role-feature-stage{min-height:310px;display:grid;align-content:center}.role-hero-icon{font-size:48px}.role-feature-stage h4{font-size:22px;margin:7px 0}.role-feature-stage p{color:var(--muted);line-height:1.5}.role-focus-list{display:grid;gap:7px;margin-top:12px}.role-focus{padding:10px;border-radius:11px;background:#f8fbf9;border:1px solid var(--line);font-size:12px}.role-dots{display:flex;justify-content:center;gap:6px}.role-dots button{width:8px;height:8px;padding:0;border:0;border-radius:50%;background:#cad6cf;cursor:pointer}.role-dots button.active{background:var(--accent);transform:scale(1.35)}
+.dynamic-feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:13px}.feature-tile{position:relative;min-height:150px;padding:15px;border:1px solid var(--line);border-radius:15px;background:#fff;cursor:pointer;overflow:hidden;transition:.2s}.feature-tile:hover{transform:translateY(-2px);border-color:var(--accent)}.feature-tile .ft-icon{font-size:26px}.feature-tile h4{margin:8px 0 5px}.feature-tile p{font-size:12px;color:var(--muted);margin:0}.feature-tile .ft-live{position:absolute;right:10px;top:10px;font-size:10px;padding:4px 7px;border-radius:999px;background:var(--soft);color:#175d42;font-weight:900}.feature-tile .ft-meter{position:absolute;left:15px;right:15px;bottom:13px;height:7px;border-radius:99px;background:#e5ece8;overflow:hidden}.feature-tile .ft-meter span{display:block;height:100%;background:var(--accent);transition:.3s}
+.home-bottom-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-top:13px}.priority-feed,.activity-feed{display:grid;gap:7px;margin-top:9px}.priority-item,.activity-item{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:9px;border:1px solid var(--line);border-radius:11px;background:#f8fbf9}.priority-icon,.activity-avatar{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--soft)}.activity-avatar{border-radius:50%;font-size:11px;font-weight:900;background:#e8eef0}.priority-item b,.activity-item b{display:block;font-size:12px}.priority-item small,.activity-item small{display:block;font-size:10px;color:var(--muted)}.priority-score{font-size:11px;font-weight:900;color:var(--warn)}
+.home-copilot-card{display:flex;flex-direction:column}.home-answer{flex:1;min-height:115px;margin-top:9px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#f2f7f4;line-height:1.5;font-size:13px}.home-answer-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.home-answer-actions button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 9px;font-size:11px;font-weight:800;cursor:pointer}
+@media(max-width:1100px){.home-command,.home-live-grid,.home-bottom-grid{grid-template-columns:1fr}.dynamic-feature-grid{grid-template-columns:1fr 1fr}.live-orbit{min-height:270px}}
+@media(max-width:680px){.command-copy h2{font-size:28px}.home-search{flex-direction:column}.dynamic-feature-grid,.signal-strip{grid-template-columns:1fr}.live-orbit{min-height:320px}.oi1{left:0}.oi2{right:0}.oi3{left:0}.oi4{right:0}}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><small>Discussion prototype</small><h1>International Digital Twin Platform</h1><p>Multi-stakeholder scenario laboratory for sustainable perennial agriculture.</p></div>
+  <nav class="nav">
+    <button class="active" data-view="home">🏠 Overview</button>
+    <button data-view="scenario">🎛 Scenario Lab</button>
+    <button data-view="quality">📦 Value Chain</button>
+    <button data-view="matrix">🧭 Twin Matrix</button>
+    <button data-view="research">🔬 Research</button>
+    <button data-view="copilot">🤖 AI Copilot</button>
+    <button data-view="stakeholders">👥 Stakeholders</button>
+    <button data-view="platform">⚙ Architecture</button>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div><h2 id="pageTitle">Platform overview</h2><p id="pageSub">Explore wider lifecycle dimensions and deeper stakeholder-specific controls.</p></div>
+    <div class="rolebar"><select id="globalCrop"><option value="apple">Apple</option><option value="vineyard">Vineyard</option></select><select id="globalRole"><option value="grower">Grower</option><option value="researcher">Researcher</option><option value="cooperative">Cooperative / Winery</option><option value="technology">Technology Provider</option><option value="manager">Research Manager</option></select><div class="avatar">RS</div></div>
+  </div>
+
+  <section id="home" class="view active">
+    <div class="home-command">
+      <div class="command-copy">
+        <span class="badge">Live multi-user workspace</span>
+        <h2 id="dynamicGreeting">Good morning, Researcher.</h2>
+        <p id="dynamicMission">Validate models, compare evidence, and turn field observations into reusable knowledge.</p>
+        <div class="home-search">
+          <input id="homeCommandInput" placeholder="Ask the platform, open a twin, compare blocks, or design an experiment…">
+          <button id="homeCommandRun">Run</button>
+        </div>
+        <div class="quick-prompts" id="quickPrompts"></div>
+      </div>
+      <div class="live-orbit" aria-label="Live platform status">
+        <div class="orbit-center">
+          <span>Digital Twin</span>
+          <b id="orbitCrop">APPLE</b>
+          <small id="orbitStatus">Controlled</small>
+        </div>
+        <button class="orbit-item oi1" data-home-action="scenario"><span>🎛</span><b>Scenario</b><small>30+ variables</small></button>
+        <button class="orbit-item oi2" data-home-action="copilot"><span>🤖</span><b>Copilot</b><small>Role-aware</small></button>
+        <button class="orbit-item oi3" data-home-action="research"><span>🔬</span><b>Research</b><small>Validate</small></button>
+        <button class="orbit-item oi4" data-home-action="quality"><span>📦</span><b>Value chain</b><small>Quality flow</small></button>
+      </div>
+    </div>
+
+    <div class="card home-copilot-card" style="margin-top:13px">
+      <div class="section-head"><div><h3>Quick answer</h3><p class="muted">Type a question above, or use a suggestion.</p></div></div>
+      <div class="home-answer" id="homeAnswer">Ask what requires attention, compare alternatives, or request a stakeholder-specific action plan.</div>
+      <div class="home-answer-actions">
+        <button data-home-question="What requires attention now?">Priorities</button>
+        <button data-home-question="Explain the biggest quality risk.">Explain risk</button>
+        <button data-home-question="Suggest the smallest useful pilot.">Pilot idea</button>
+      </div>
+    </div>
+
+    <div class="home-live-grid">
+      <div class="card live-field-card">
+        <div class="section-head">
+          <div><h3>Live field twin</h3><p class="muted">Signals update as the scenario changes.</p></div>
+          <div class="live-dot"><span></span> Simulated live</div>
+        </div>
+        <div class="scene home-scene">
+          <div class="sun" id="homeSun"></div>
+          <div class="hills"></div>
+          <div class="rows" id="homeFieldRows"></div>
+          <div class="sensor s1 pulse"></div><div class="sensor s2 pulse delay"></div><div class="sensor s3 pulse delay2"></div>
+          <div class="floating f1" id="homeFieldLabel">Block A3 · maturity 82%</div>
+          <div class="floating f2" id="homeRiskLabel">Risk: Low</div>
+          <div class="weather-strip" id="weatherStrip">
+            <span>24°C</span><span>VPD 1.2</span><span>Soil 28%</span><span>Rain 20 mm</span>
+          </div>
+        </div>
+        <div class="signal-strip" id="signalStrip"></div>
+      </div>
+
+      <div class="card stakeholder-now">
+        <div class="section-head">
+          <div><h3 id="homeRoleTitle">Researcher workspace</h3><p class="muted" id="homeRoleSubtitle">Evidence, uncertainty, and validation.</p></div>
+          <button class="icon-button" id="cycleRole" title="Cycle stakeholder">↻</button>
+        </div>
+        <div class="role-feature-stage" id="roleFeatureStage"></div>
+        <div class="role-dots" id="roleDots"></div>
+      </div>
+    </div>
+
+    <div class="dynamic-feature-grid" id="majorFeatureGrid"></div>
+
+  </section>
+
+  <section id="matrix" class="view">
+    <div class="card"><h3>Digital Twin Matrix</h3><p class="muted">Horizontal: lifecycle. Vertical: scientific, operational, commercial, and sustainability dimensions.</p>
+      <div class="matrix-wrap"><div class="matrix" id="matrixGrid"></div></div>
+    </div>
+  </section>
+
+  <section id="scenario" class="view">
+    <div class="scenario-layout">
+      <div class="card control-panel">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div><h3>Scenario controls</h3><p class="muted">Adjust field-to-market assumptions.</p></div><button class="primary" id="resetBtn">Reset</button></div>
+        <div class="presetbar"><button data-preset="heat">Heat wave</button><button data-preset="wet">Wet disease period</button><button data-preset="delay">Harvest/logistics delay</button><button data-preset="efficient">Resource-efficient</button><button data-preset="thinning">Flower thinning window</button><button data-preset="lido">LiDO reference site</button></div>
+        <div id="controls"></div>
+      </div>
+      <div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><h3 id="sceneTitle">Apple Digital Twin</h3><p class="muted">Dynamic visual response to the selected scenario.</p></div><span class="badge" id="scenarioStatus">Baseline</span></div>
+          <div class="scene"><div class="sun" id="sun"></div><div class="hills"></div><div class="rows" id="fieldRows"></div><div class="sensor s1"></div><div class="sensor s2"></div><div class="sensor s3"></div><div class="floating f1" id="fieldLabel">Block A3 · maturity 82%</div><div class="floating f2" id="riskLabel">Stress risk: Low</div></div>
+          <div class="results">
+            <div class="result"><small>Crop quality</small><b id="rQuality">91</b></div>
+            <div class="result"><small>Yield index</small><b id="rYield">96</b></div>
+            <div class="result"><small>Water efficiency</small><b id="rWater">84%</b></div>
+            <div class="result"><small>Waste risk</small><b id="rWaste">Low</b></div>
+            <div class="result"><small>Gross value index</small><b id="rValue">94</b></div>
+            <div class="result"><small>Confidence</small><b id="rConfidence">0.78</b></div>
+          </div>
+          <div class="notice"><b id="stakeholderName">Grower recommendation:</b> <span id="recommendation">Maintain irrigation and monitor maturity.</span></div>
+        </div>
+        <div class="card" style="margin-top:13px"><h3>Quality flow across the lifecycle</h3><div class="lifecycle" id="lifecycle"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="stakeholders" class="view">
+    <div class="card"><h3>Multiple stakeholder perspectives</h3><p class="muted">Select a role to change priorities, outputs, recommendations, and success measures.</p><div class="persona-panel" id="personaPanel"></div></div>
+    <div class="grid g2" style="margin-top:13px"><div class="card"><h3 id="personaTitle">Grower perspective</h3><p id="personaNeed" class="muted"></p><h4>Priority questions</h4><ul id="personaQuestions"></ul></div><div class="card"><h3>Decision outputs</h3><ul id="personaOutputs"></ul><div class="grid g4" id="personaKpis"></div></div></div>
+  </section>
+
+  <section id="copilot" class="view">
+    <div class="grid g2">
+      <div class="card copilot"><div><h3>User-defined AI Copilot</h3><p class="muted">Select role, crop, objectives, and response style.</p></div><div class="chat" id="chat"><div class="msg ai">I can explain the current scenario, compare alternatives, suggest an experiment, or produce a stakeholder-specific action plan.</div></div><div class="copilot-chips" id="copilotChips"></div><div class="chatinput"><input id="chatInput" placeholder="Ask the Copilot..."><button id="chatSend">Send</button></div><p class="copilot-hint">Try asking about: <b>irrigation</b> · <b>harvest timing</b> · <b>thinning</b> · <b>disease risk</b> · <b>storage window</b> · <b>comparing scenarios</b> · <b>confidence</b> · <b>pilot design</b> · <b>economics</b> · <b>sustainability</b> · <b>risk priorities</b> · <b>lot/intake priority</b>. Every answer shows which values it used.</p></div>
+      <div class="card"><h3>Copilot configuration</h3><div class="grid g3" style="gap:10px"><div><label style="display:block;margin-bottom:5px">Primary objective</label><select id="copilotObjective" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px"><option>Quality</option><option>Yield</option><option>Water efficiency</option><option>Waste reduction</option><option>Scientific validation</option><option>Economic return</option></select></div><div><label style="display:block;margin-bottom:5px">Answer style</label><select id="copilotStyle" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px"><option>Concise action</option><option>Scientific explanation</option><option>Management brief</option><option>Experiment design</option></select></div><div><label style="display:block;margin-bottom:5px">Risk tolerance</label><select id="copilotRisk" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px"><option>Conservative</option><option>Balanced</option><option>Experimental</option></select></div></div><div class="notice"><b>Grounding:</b> answers are generated from the live scenario parameters shown in Scenario Lab, using transparent rule-based logic prepared for this discussion — not a live predictive AI model, and not yet validated against measured orchard data.</div></div>
+    </div>
+  </section>
+
+  <section id="research" class="view">
+    <div class="card">
+      <h3>Hypothesis Builder</h3>
+      <p class="muted">Pick a variable and an outcome. The hypothesis, experiment, and validation plan below are computed live from the current Scenario Lab state — not fixed text.</p>
+      <div class="grid g2" style="margin-top:10px">
+        <div><label style="display:block;font-size:12px;color:var(--muted);margin-bottom:6px">Independent variable</label><select id="rb_iv" style="width:100%;padding:9px 10px;border-radius:9px;border:1px solid var(--line);font:inherit"></select></div>
+        <div><label style="display:block;font-size:12px;color:var(--muted);margin-bottom:6px">Outcome</label><select id="rb_dep" style="width:100%;padding:9px 10px;border-radius:9px;border:1px solid var(--line);font:inherit">
+          <option value="quality">Predicted quality</option>
+          <option value="yieldIdx">Predicted yield</option>
+          <option value="waterEff">Water efficiency</option>
+          <option value="waste">Waste / loss risk</option>
+          <option value="value">Economic value index</option>
+          <option value="conf">Model confidence</option>
+        </select></div>
+      </div>
+      <div class="grid g3" style="margin-top:14px">
+        <div class="control-row" style="display:block;text-align:center;padding:10px;border:1px solid var(--line);border-radius:11px"><div style="font-size:11px;color:var(--muted);text-transform:uppercase">Low (<span id="rb_minLabel"></span>)</div><b id="rb_outMin" style="font-size:20px"></b></div>
+        <div class="control-row" style="display:block;text-align:center;padding:10px;border:2px solid var(--accent);border-radius:11px"><div style="font-size:11px;color:var(--muted);text-transform:uppercase">Current (<span id="rb_curLabel"></span>)</div><b id="rb_outCur" style="font-size:20px"></b></div>
+        <div class="control-row" style="display:block;text-align:center;padding:10px;border:1px solid var(--line);border-radius:11px"><div style="font-size:11px;color:var(--muted);text-transform:uppercase">High (<span id="rb_maxLabel"></span>)</div><b id="rb_outMax" style="font-size:20px"></b></div>
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:13px">
+      <div class="card"><h3>Hypothesis</h3><p class="muted" id="rb_hypothesis"></p></div>
+      <div class="card"><h3>Experiment</h3><p class="muted" id="rb_experiment"></p></div>
+      <div class="card"><h3>Validation</h3><p class="muted" id="rb_validation"></p></div>
+    </div>
+    <div class="card" style="margin-top:13px"><table class="table"><tr><th>Dimension</th><th>Candidate variables</th><th>Primary stakeholder</th></tr><tr><td>Environment</td><td>Temperature, rainfall, VPD, solar radiation</td><td>Researcher / Grower</td></tr><tr><td>Physiology</td><td>Phenology, water potential, fruit/berry maturity</td><td>Researcher</td></tr><tr><td>Operations</td><td>Irrigation, canopy, harvest timing, labor</td><td>Grower</td></tr><tr><td>Quality</td><td>Firmness, Brix, acidity, defects, shelf/process window</td><td>Cooperative / Winery</td></tr><tr><td>Sustainability</td><td>Water, energy, carbon, biodiversity proxy</td><td>Manager / Policy</td></tr></table></div>
+  </section>
+
+  <script>
+  (function(){
+  const outcomeDefs={
+   quality:{label:'predicted quality',fmt:v=>Math.round(v),metric:'fruit/wine quality assessments (firmness, Brix, sensory panel)'},
+   yieldIdx:{label:'predicted yield',fmt:v=>Math.round(v),metric:'actual harvested yield per block'},
+   waterEff:{label:'water efficiency',fmt:v=>Math.round(v)+'%',metric:'measured irrigation volume against soil-moisture outcomes'},
+   waste:{label:'waste / loss risk',fmt:v=>Math.round(v),metric:'actual postharvest loss or rejection rates'},
+   value:{label:'economic value index',fmt:v=>Math.round(v),metric:'realized market value per lot'},
+   conf:{label:'model confidence',fmt:v=>v.toFixed(2),metric:'agreement between repeated model runs and repeated field measurements'}
+  };
+  function simulateOutcome(s){
+   const climate=Math.abs(s.temperature)*1.3+Math.max(0,s.vpd-1.2)*7+Math.max(0,s.humidity-80)*.25;
+   const water=Math.max(0,28-s.soil)*1.1+Math.max(0,18-s.irrigation)*.7;
+   const bio=s.stress*.18+s.disease*.22+Math.abs(s.cropLoad-100)*.08;
+   const ops=s.harvestDelay*.18+s.cooling*.35+(100-s.handling)*.22+(100-s.cold)*.25;
+   const chain=s.lead*.28+s.shelf*.35+s.claims*.08;
+   const quality=Math.max(35,96-climate-water-bio-ops-chain*.35+s.pack*.04);
+   const yieldIdx=Math.max(40,104-climate*.45-water*.7-bio*.5-Math.max(0,100-s.labor)*.2);
+   const waterEff=Math.max(30,96-Math.abs(s.irrigation-18)*1.2-Math.max(0,s.vpd-1.5)*5+(s.drainage-75)*.08);
+   const waste=Math.max(2,100-quality+s.cooling*.25+s.lead*.25);
+   const value=Math.max(30,(quality*.55+yieldIdx*.35+s.price*.1)-Math.max(0,s.energy-100)*.08);
+   const conf=Math.max(.42,Math.min(.94,.82-(s.disease+s.stress)*.0015-Math.abs(s.temperature)*.006));
+   return {quality,yieldIdx,waterEff,waste,value,conf};
+  }
+  function populateIvSelect(){
+   const sel=document.getElementById('rb_iv');
+   sel.innerHTML=groups.map(g=>`<optgroup label="${g.name}">${g.items.map(i=>`<option value="${i[0]}">${i[1]}</option>`).join('')}</optgroup>`).join('');
+   sel.value='temperature';
+  }
+  function ivMeta(key){for(const g of groups){for(const i of g.items){if(i[0]===key)return {label:i[1],unit:i[2],min:i[3],max:i[4]};}}return null;}
+  function topRisks(){
+   const r=[];
+   if(state.disease>40)r.push('disease pressure');
+   if(state.stress>35)r.push('plant stress');
+   if(state.harvestDelay>20)r.push('harvest delay');
+   if(state.cooling>20)r.push('cooling/process delay');
+   if(state.claims>30)r.push('claim risk');
+   return r.length?r:['the other currently active scenario parameters'];
+  }
+  function refreshBuilder(){
+   const ivKey=document.getElementById('rb_iv').value;
+   const depKey=document.getElementById('rb_dep').value;
+   const iv=ivMeta(ivKey); if(!iv) return;
+   const dep=outcomeDefs[depKey];
+   const base={...state};
+   const lowState={...state,[ivKey]:iv.min};
+   const highState={...state,[ivKey]:iv.max};
+   const outLow=simulateOutcome(lowState)[depKey];
+   const outCur=simulateOutcome(base)[depKey];
+   const outHigh=simulateOutcome(highState)[depKey];
+   document.getElementById('rb_minLabel').textContent=iv.min+iv.unit;
+   document.getElementById('rb_curLabel').textContent=Math.round(base[ivKey]*10)/10+iv.unit;
+   document.getElementById('rb_maxLabel').textContent=iv.max+iv.unit;
+   document.getElementById('rb_outMin').textContent=dep.fmt(outLow);
+   document.getElementById('rb_outCur').textContent=dep.fmt(outCur);
+   document.getElementById('rb_outMax').textContent=dep.fmt(outHigh);
+   const delta=outHigh-outLow;
+   const tol=Math.max(1,Math.abs(outCur)*.02);
+   let relation;
+   if(outCur>outLow+tol && outCur>outHigh+tol) relation=`shows a peak in ${dep.label} near the current setting (${dep.fmt(outCur)} at ${document.getElementById('rb_curLabel').textContent}), with ${dep.label} lower toward both ends of the tested range (${dep.fmt(outLow)} at ${iv.min}${iv.unit}, ${dep.fmt(outHigh)} at ${iv.max}${iv.unit})`;
+   else if(outCur<outLow-tol && outCur<outHigh-tol) relation=`shows a dip in ${dep.label} near the current setting (${dep.fmt(outCur)} at ${document.getElementById('rb_curLabel').textContent}), with ${dep.label} higher toward both ends of the tested range (${dep.fmt(outLow)} at ${iv.min}${iv.unit}, ${dep.fmt(outHigh)} at ${iv.max}${iv.unit})`;
+   else if(Math.abs(delta)<tol) relation=`has little effect on ${dep.label} across the tested range (about ${dep.fmt(outLow)}–${dep.fmt(outHigh)})`;
+   else relation=(delta>0?'increases':'decreases')+` ${dep.label} across its tested range — from ${dep.fmt(outLow)} at ${iv.min}${iv.unit} to ${dep.fmt(outHigh)} at ${iv.max}${iv.unit}, with the current value (${document.getElementById('rb_curLabel').textContent}) giving ${dep.fmt(outCur)}`;
+   document.getElementById('rb_hypothesis').textContent=`${iv.label} ${relation}.`;
+   document.getElementById('rb_experiment').textContent=`Compare matched blocks or parcels at low vs high ${iv.label} while holding other major drivers constant, particularly ${topRisks().join(', ')}. Measure ${dep.label} across at least one full season, with 3+ replicate blocks per level.`;
+   document.getElementById('rb_validation').textContent=`Validate by comparing this model's predicted ${dep.label} against ${dep.metric}, across replicate blocks. Assess correlation and mean error, and repeat across at least one additional season or site (e.g. Laimburg vs Punchbowl Haven) before relying on the prediction operationally.`;
+  }
+  window.addEventListener('load',function(){
+  populateIvSelect();
+  document.getElementById('rb_iv').addEventListener('change',refreshBuilder);
+  document.getElementById('rb_dep').addEventListener('change',refreshBuilder);
+  refreshBuilder();
+  // keep the builder in sync whenever Scenario Lab values change
+  const _origUpdateScenario=window.updateScenario;
+  window.updateScenario=function(){_origUpdateScenario();refreshBuilder();};
+  });
+  })();
+  </script>
+
+  <style>
+  .vc-widget{--vc-bg:#f4f7f3;--vc-card:#fff;--vc-ink:#163323;--vc-muted:#6c7a71;--vc-green:#2f7d4a;--vc-green2:#8abb78;--vc-line:#dce7dd;--vc-amber:#d79d28;--vc-red:#c85d4e;--vc-blue:#4d88a8;font-family:Arial,Helvetica,sans-serif;color:var(--vc-ink)}
+  .vc-widget *{box-sizing:border-box}
+  .vc-widget .vc-main{max-width:1450px;margin:auto;padding:4px 0 18px}
+  .vc-widget .vc-grid{display:grid;grid-template-columns:320px 1fr;gap:16px}
+  .vc-widget .vc-card{background:var(--vc-card);border:1px solid var(--vc-line);border-radius:14px;padding:15px;box-shadow:0 3px 12px rgba(20,50,30,.05)}
+  .vc-widget h2{font-size:18px;margin:0 0 12px}
+  .vc-widget h3{font-size:14px;margin:14px 0 8px}
+  .vc-widget label{display:block;font-size:12px;color:var(--vc-muted);margin-top:11px}
+  .vc-widget select,.vc-widget input[type=range]{width:100%;margin-top:5px}
+  .vc-widget .vc-value{float:right;color:var(--vc-green);font-weight:bold}
+  .vc-widget .vc-btn{width:100%;border:0;border-radius:9px;padding:11px;background:var(--vc-green);color:#fff;font-weight:bold;margin-top:13px;cursor:pointer}
+  .vc-widget .vc-small{font-size:11px;color:var(--vc-muted);line-height:1.45}
+  .vc-widget .vc-hero{display:grid;grid-template-columns:1.4fr .9fr;gap:14px}
+  .vc-widget .vc-qualitybox{display:flex;align-items:center;gap:18px}
+  .vc-widget .vc-ring{width:145px;height:145px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--vc-green) 0 82%,#e7eee8 82%);position:relative}
+  .vc-widget .vc-ring::before{content:"";width:108px;height:108px;border-radius:50%;background:#fff;position:absolute}
+  .vc-widget .vc-ring span{position:relative;font-size:34px;font-weight:bold;color:var(--vc-green)}
+  .vc-widget .vc-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .vc-widget .vc-kpi{border:1px solid var(--vc-line);border-radius:10px;padding:10px;background:#f8fbf8}
+  .vc-widget .vc-kpi b{display:block;font-size:20px;color:var(--vc-green)}
+  .vc-widget .vc-kpi span{font-size:11px;color:var(--vc-muted)}
+  .vc-widget .vc-timeline{display:flex;gap:8px;overflow:auto;padding:5px 0}
+  .vc-widget .vc-stage{min-width:122px;border:1px solid var(--vc-line);border-radius:11px;padding:10px;background:#fff;cursor:pointer;position:relative}
+  .vc-widget .vc-stage.active{border-color:var(--vc-green);outline:3px solid rgba(47,125,74,.18)}
+  .vc-widget .vc-stage h4{margin:0 0 5px;font-size:13px}
+  .vc-widget .vc-stage .q{font-size:24px;font-weight:bold;color:var(--vc-green)}
+  .vc-widget .vc-stage .loss{font-size:10px;color:var(--vc-red)}
+  .vc-widget .vc-stage::after{content:"→";position:absolute;right:-10px;top:38px;color:var(--vc-green);font-weight:bold}
+  .vc-widget .vc-stage:last-child::after{display:none}
+  .vc-widget .vc-two{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+  .vc-widget .vc-panel{border:1px solid var(--vc-line);border-radius:11px;padding:12px;background:#fbfdfb}
+  .vc-widget .vc-action{border-left:5px solid var(--vc-green);background:#eef7f0;padding:12px;border-radius:8px;line-height:1.45}
+  .vc-widget .vc-warning{border-left:5px solid var(--vc-amber);background:#fff7e4;padding:11px;border-radius:8px;line-height:1.4}
+  .vc-widget table{width:100%;border-collapse:collapse;font-size:12px}
+  .vc-widget th,.vc-widget td{padding:8px;border-bottom:1px solid var(--vc-line);text-align:left;vertical-align:top}
+  .vc-widget th{color:var(--vc-muted)}
+  .vc-widget .vc-perspectives{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .vc-widget .vc-persp{border:1px solid var(--vc-line);border-radius:10px;padding:10px;background:#fff}
+  .vc-widget .vc-persp b{font-size:13px}
+  .vc-widget .vc-persp p{font-size:11px;color:var(--vc-muted);line-height:1.4;margin:6px 0}
+  .vc-widget .vc-chatwrap{display:grid;grid-template-columns:300px 1fr;gap:12px}
+  .vc-widget .vc-chat{height:260px;overflow:auto;background:var(--vc-bg);border:1px solid var(--vc-line);border-radius:10px;padding:10px}
+  .vc-widget .vc-msg{max-width:88%;padding:9px 10px;margin:7px 0;border-radius:10px;font-size:12px;line-height:1.45;white-space:pre-wrap}
+  .vc-widget .vc-msg-user{margin-left:auto;background:#dfeee2}
+  .vc-widget .vc-msg-bot{background:#fff;border:1px solid var(--vc-line)}
+  .vc-widget .vc-chatrow{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:8px}
+  .vc-widget .vc-chatrow input{padding:10px;border:1px solid var(--vc-line);border-radius:9px}
+  .vc-widget .vc-send{border:0;border-radius:9px;background:var(--vc-green);color:#fff;padding:0 15px;font-weight:bold}
+  .vc-widget .vc-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .vc-widget .vc-chip{border:1px solid #cfe0d2;border-radius:15px;padding:6px 8px;background:#eef7f0;color:var(--vc-green);font-size:10px;cursor:pointer}
+  @media(max-width:1000px){.vc-widget .vc-grid,.vc-widget .vc-hero,.vc-widget .vc-two,.vc-widget .vc-chatwrap{grid-template-columns:1fr}.vc-widget .vc-kpis{grid-template-columns:repeat(2,1fr)}.vc-widget .vc-perspectives{grid-template-columns:repeat(2,1fr)}}
+  </style>
+
+  <section id="quality" class="view">
+  <div class="vc-widget"><div class="vc-main"><div class="vc-grid">
+  <aside class="vc-card">
+  <h2>Lot Inputs</h2>
+  <label>Cultivar<select id="vc_cultivar"></select></label>
+  <label>Harvest maturity<select id="vc_maturity"><option value="optimal">Optimal</option><option value="early">Too early</option><option value="late">Too late</option></select></label>
+  <label>Field temperature <span class="vc-value" id="vc_tempLabel">22°C</span><input id="vc_temp" type="range" min="10" max="35" value="22"></label>
+  <label>Picking care <span class="vc-value" id="vc_careLabel">85%</span><input id="vc_care" type="range" min="40" max="100" value="85"></label>
+  <label>Cooling delay <span class="vc-value" id="vc_delayLabel">4 h</span><input id="vc_delay" type="range" min="0" max="24" value="4"></label>
+  <label>Storage temperature <span class="vc-value" id="vc_storageLabel">1°C</span><input id="vc_storage" type="range" min="0" max="12" value="1"></label>
+  <label>Transport duration <span class="vc-value" id="vc_transportLabel">18 h</span><input id="vc_transport" type="range" min="1" max="120" value="18"></label>
+  <label>Cold chain<select id="vc_cold"><option value="yes">Maintained</option><option value="partial">Partially maintained</option><option value="no">Not maintained</option></select></label>
+  <label>Retail shelf time <span class="vc-value" id="vc_shelfLabel">3 days</span><input id="vc_shelf" type="range" min="1" max="14" value="3"></label>
+  <button class="vc-btn" id="vc_simulate">Run AI Quality Simulation</button>
+  <p class="vc-small">The prototype uses transparent rules to demonstrate the AI logic. A production system would learn from WUR experiments, sensors, images, storage records, logistics data and consumer feedback.</p>
+  </aside>
+  <section>
+  <div class="vc-hero">
+  <div class="vc-card">
+  <h2 id="vc_title">Quality Twin</h2>
+  <div class="vc-qualitybox"><div class="vc-ring" id="vc_ring"><span id="vc_quality">82</span></div><div><h3 style="margin-top:0" id="vc_kpiHeading">Predicted Consumer Quality</h3><p id="vc_summary">Good eating quality with manageable post-harvest risk.</p><div class="vc-kpis"><div class="vc-kpi"><b id="vc_firmness">7.2</b><span id="vc_kpiLabel1">Firmness kg/cm²</span></div><div class="vc-kpi"><b id="vc_brix">13.8</b><span>Soluble solids °Brix</span></div><div class="vc-kpi"><b id="vc_shelfLife">24 d</b><span id="vc_kpiLabel3">Remaining shelf life</span></div><div class="vc-kpi"><b id="vc_waste">6%</b><span>Predicted waste risk</span></div></div></div></div>
+  </div>
+  <div class="vc-card"><h2>Best Next Action</h2><div class="vc-action" id="vc_bestAction"></div><h3>Main quality risk</h3><div class="vc-warning" id="vc_mainRisk"></div></div>
+  </div>
+
+  <div class="vc-card" style="margin-top:14px"><h2>Quality Journey Across the Supply Chain</h2><div class="vc-timeline" id="vc_timeline"></div></div>
+
+  <div class="vc-two" style="margin-top:14px">
+  <div class="vc-card"><h2>Selected Stage Detail</h2><div class="vc-panel"><h3 id="vc_stageTitle">Production</h3><p id="vc_stageExplain" class="vc-small"></p><table><tr><th>Quality factors</th><td id="vc_stageFactors"></td></tr><tr><th>Actions</th><td id="vc_stageActions"></td></tr><tr><th>AI role</th><td id="vc_stageAI"></td></tr></table></div></div>
+  <div class="vc-card"><h2>Is a Cold Chain Needed?</h2><p class="vc-small">For long-distance distribution and storage, apples benefit strongly from refrigerated handling because low temperature slows respiration, moisture loss, softening and decay. Very short local distribution may tolerate simpler handling, but time and temperature must still be controlled.</p><div class="vc-action" id="vc_coldAdvice"></div></div>
+  </div>
+
+  <div class="vc-card" style="margin-top:14px"><h2>Product Quality from Stakeholder Perspectives</h2><div class="vc-perspectives">
+  <div class="vc-persp"><b>Grower</b><p id="vc_persp_grower">Yield, colour, size, disease-free fruit, high pack-out and return per hectare.</p></div>
+  <div class="vc-persp"><b>Wholesaler</b><p id="vc_persp_wholesaler">Uniform lots, predictable storage life, low shrinkage and dependable supply.</p></div>
+  <div class="vc-persp"><b>Trader</b><p id="vc_persp_trader">Specification compliance, delivery reliability, export fitness and low claims.</p></div>
+  <div class="vc-persp"><b>Retailer</b><p id="vc_persp_retailer">Appearance, shelf life, sell-through, low waste and customer satisfaction.</p></div>
+  <div class="vc-persp"><b>Consumer</b><p id="vc_persp_consumer">Taste, sweetness, crispness, freshness, safety, convenience and value.</p></div>
+  </div></div>
+
+  <div class="vc-card" style="margin-top:14px"><h2>AI LLM Quality Assistant</h2><div class="vc-chatwrap"><div><label>Perspective (set at top of page)<div class="vc-value" id="vc_activeRole" style="float:none;display:inline-block;margin-top:5px;background:#eef7f0;border:1px solid #cfe0d2;border-radius:8px;padding:6px 10px;color:var(--vc-green);font-weight:bold">Grower</div></label><h3>Suggested questions</h3><div class="vc-chips"><button class="vc-chip">What should I do now?</button><button class="vc-chip">Why did quality fall?</button><button class="vc-chip">Can this lot go to export?</button><button class="vc-chip">How long can we store it?</button><button class="vc-chip">How should the consumer handle it?</button></div><p class="vc-small">Built-in domain copilot for the demo. Production version: secure LLM + WUR knowledge base + real-time twin data.</p></div><div><div class="vc-chat" id="vc_chat"><div class="vc-msg vc-msg-bot" id="vc_greeting">Hello. I am the Quality Copilot. I can explain the current lot quality and recommend the next action for each stakeholder.</div></div><div class="vc-chatrow"><input id="vc_question" placeholder="Ask about quality, storage, transport, market destination or consumer handling..."><button class="vc-send" id="vc_send">Ask AI</button></div></div></div></div>
+  </section>
+  </div></div></div>
+  </section>
+
+  <script>
+  (function(){
+  const $=id=>document.getElementById(id);
+  const appleCultivars=['Rosy Glow Pink Lady®','Fuji','Gala','Golden Delicious','Jonagold'];
+  const vineCultivars=['Chardonnay','Pinot Bianco','Sauvignon Blanc','Gewürztraminer','Lagrein'];
+  const stageDefsApple=[
+  ['Production','Cultivar, rootstock, climate, sunlight, irrigation, fertilization, thinning, canopy, pests','Choose suitable cultivar; balance crop load; manage water and nutrients; control disease; monitor colour and maturity','Predict yield, colour, size and disease risk'],
+  ['Harvest','Season, harvest moment, fruit temperature, maturity, weather, labour','Pick at optimum maturity; avoid wet harvest; train pickers; use padded bins','Recommend harvest date, block order and labour plan'],
+  ['Grading & Packing','Bruising, defects, size, colour, handling speed, packaging','Use gentle transfer; computer-vision grading; route fruit by quality; protect against pressure damage','Detect defects and match lots to market requirements'],
+  ['Cooling','Field heat, cooling delay, cooling rate, airflow','Pre-cool rapidly; monitor pulp temperature; avoid condensation','Recommend cooling protocol and predict loss from delay'],
+  ['Storage','Temperature, humidity, O₂, CO₂, ethylene, duration','Maintain suitable cold/controlled atmosphere; monitor rooms; use FEFO','Predict remaining shelf life and optimize storage conditions'],
+  ['Transport','Temperature, humidity, vibration, delay, door openings','Use refrigerated transport for long routes; log temperature; reduce shocks and delays','Optimize route and detect cold-chain excursions'],
+  ['Wholesale','Lot uniformity, inventory age, availability, peak/off-season','Inspect incoming lots; rotate by remaining life; allocate to suitable channels','Rank inventory by quality and destination'],
+  ['Trader','Specifications, lead time, export rules, market price, claims risk','Match lot to buyer specification; preserve traceability; minimize transit time','Select best market and forecast claims risk'],
+  ['Retail','Display temperature, shelf time, handling, stock rotation','Use FEFO; avoid heat and bruising; remove damaged fruit; replenish in smaller batches','Predict sell-through, waste and markdown timing'],
+  ['Consumer','Trip home, refrigerator use, handling, consumption timing','Refrigerate for longer life; avoid bruising; consume ripe fruit first','Give personalized storage and consumption advice']
+  ];
+  const stageDefsVine=[
+  ['Production','Variety, rootstock, terroir, canopy microclimate, irrigation, disease pressure','Choose suitable variety/clone; manage canopy and water; control disease; monitor véraison and sugar accumulation','Predict yield, sugar/acid balance and disease risk'],
+  ['Harvest','Season, harvest moment (Brix/acid/pH), berry temperature, weather, hand vs machine harvest','Harvest at target technological/phenolic maturity; avoid heat stress; plan logistics to winery','Recommend harvest date, block order and winery-intake scheduling'],
+  ['Sorting & Crushing','Bunch/berry sorting, MOG removal, crushing/destemming, handling speed','Sort out damaged or unripe berries; crush gently; protect against oxidation','Detect defects and route lots to appropriate wine styles'],
+  ['Cooling / Cold Soak','Grape temperature at intake, cooling delay, cold-soak conditions','Cool grapes promptly if needed; manage cold-soak duration and temperature','Recommend cooling protocol and predict extraction/quality impact'],
+  ['Fermentation','Temperature, yeast, nutrients, maceration time, SO₂ management','Control fermentation temperature; manage cap/extraction; monitor progress','Predict fermentation trajectory and flag stuck/slow risk'],
+  ['Maturation & Transport','Barrel/tank conditions, temperature, humidity, transfer vibration and delay','Maintain suitable aging conditions; use temperature-controlled transport for bulk/bottled wine','Optimize maturation schedule and detect quality excursions'],
+  ['Wholesale','Bulk/bottled inventory age, availability, peak/off-season demand','Inspect incoming lots; rotate by remaining life; allocate to suitable channels','Rank inventory by quality and destination'],
+  ['Trader','Specifications, lead time, export/appellation rules, market price, claims risk','Match lot to buyer specification; preserve traceability; minimize transit time','Select best market and forecast claims risk'],
+  ['Retail','Display temperature/light, shelf time, handling, stock rotation','Store away from heat and light; avoid vibration; rotate stock','Predict sell-through, spoilage and markdown timing'],
+  ['Consumer','Cellar/fridge storage, serving temperature, decanting, consumption timing','Store away from light and heat; serve at correct temperature; drink within the recommended window','Give personalized storage and drink-by guidance']
+  ];
+  let stageDefs=stageDefsApple;
+  let stageScores=[];
+
+  function cropInfo(){
+   const crop=(document.getElementById('globalCrop')||{value:'apple'}).value;
+   return crop==='vineyard'
+    ? {crop:'vineyard',label:'Vineyard',cultivars:vineCultivars,stages:stageDefsVine,kpi1:'Titratable acidity g/L',kpi3unit:' mo',kpi3label:'Aging / drinking window',greeting:'Hello. I am the Quality Copilot. I can explain the current parcel/lot quality and recommend the next action for each stakeholder.',persp:{grower:'Yield, sugar/acid balance, disease-free fruit, high pack-out and return per hectare.',wholesaler:'Uniform lots, predictable aging life, low shrinkage and dependable supply.',trader:'Specification and appellation compliance, delivery reliability, export fitness and low claims.',retailer:'Appearance, shelf/aging life, sell-through, low spoilage and customer satisfaction.',consumer:'Aroma, balance, freshness, safety, convenience and value.'}}
+    : {crop:'apple',label:'Apple',cultivars:appleCultivars,stages:stageDefsApple,kpi1:'Firmness kg/cm²',kpi3unit:' d',kpi3label:'Remaining shelf life',greeting:'Hello. I am the Quality Copilot. I can explain the current lot quality and recommend the next action for each stakeholder.',persp:{grower:'Yield, colour, size, disease-free fruit, high pack-out and return per hectare.',wholesaler:'Uniform lots, predictable storage life, low shrinkage and dependable supply.',trader:'Specification compliance, delivery reliability, export fitness and low claims.',retailer:'Appearance, shelf life, sell-through, low waste and customer satisfaction.',consumer:'Taste, sweetness, crispness, freshness, safety, convenience and value.'}};
+  }
+
+  const roleLabels={grower:'Grower',researcher:'Researcher',cooperative:'Cooperative / Winery',technology:'Technology Provider',manager:'Research Manager'};
+  function activeRoleLabel(){
+   const roleSel=document.getElementById('globalRole');
+   const key=roleSel?roleSel.value:'grower';
+   return roleLabels[key]||'Grower';
+  }
+  function refreshRoleBadge(){const el=$('vc_activeRole');if(el)el.textContent=activeRoleLabel();}
+
+  function populateCultivars(ci){
+   $('vc_cultivar').innerHTML=ci.cultivars.map(c=>`<option>${c}</option>`).join('');
+  }
+
+  function onCropChange(){
+   const ci=cropInfo();
+   stageDefs=ci.stages;
+   populateCultivars(ci);
+   $('vc_title').textContent=ci.label+' Quality Twin';
+   $('vc_kpiLabel1').textContent=ci.kpi1;
+   $('vc_kpiLabel3').textContent=ci.kpi3label;
+   $('vc_greeting').textContent=ci.greeting;
+   $('vc_persp_grower').textContent=ci.persp.grower;
+   $('vc_persp_wholesaler').textContent=ci.persp.wholesaler;
+   $('vc_persp_trader').textContent=ci.persp.trader;
+   $('vc_persp_retailer').textContent=ci.persp.retailer;
+   $('vc_persp_consumer').textContent=ci.persp.consumer;
+   vcCalc();
+  }
+
+  function vcCalc(){
+   const ci=cropInfo();
+   const maturity=$('vc_maturity').value,temp=+$('vc_temp').value,care=+$('vc_care').value,delay=+$('vc_delay').value,storage=+$('vc_storage').value,transport=+$('vc_transport').value,cold=$('vc_cold').value,shelf=+$('vc_shelf').value;
+   $('vc_tempLabel').textContent=temp+'°C';$('vc_careLabel').textContent=care+'%';$('vc_delayLabel').textContent=delay+' h';$('vc_storageLabel').textContent=storage+'°C';$('vc_transportLabel').textContent=transport+' h';$('vc_shelfLabel').textContent=shelf+' days';
+   let q=96; if(maturity==='early')q-=12;if(maturity==='late')q-=9;q-=Math.max(0,temp-24)*.6;q-=(100-care)*.18;q-=delay*.55;q-=Math.max(0,storage-3)*1.4;q-=transport*(cold==='yes'?.015:cold==='partial'?.05:.09);q-=shelf*1.15;q=Math.max(35,Math.round(q));
+   const brix=(maturity==='early'?11.5:maturity==='late'?14.4:13.8).toFixed(1);const firm=(8.2-(maturity==='late'?1.1:0)-delay*.025-Math.max(0,storage-3)*.08-shelf*.09).toFixed(1);const life=Math.max(2,Math.round(38-delay*.65-Math.max(0,storage-2)*2.2-transport*(cold==='yes'?.03:.1)-shelf));const waste=Math.min(45,Math.max(3,Math.round((100-q)*.45)));
+   $('vc_quality').textContent=q;$('vc_ring').style.background=`conic-gradient(var(--vc-green) 0 ${q}%,#e7eee8 ${q}%)`;$('vc_firmness').textContent=firm;$('vc_brix').textContent=brix;$('vc_shelfLife').textContent=life+ci.kpi3unit;$('vc_waste').textContent=waste+'%';
+   $('vc_summary').textContent=q>=85?'Excellent market and eating-quality potential.':q>=70?'Good eating quality with manageable post-harvest risk.':'Quality is declining; rapid corrective action is required.';
+   let risks=[];if(maturity!=='optimal')risks.push('harvest maturity');if(delay>6)risks.push('cooling delay');if(storage>4)risks.push('storage temperature');if(cold!=='yes'&&transport>12)risks.push('cold-chain continuity');if(care<75)risks.push('handling damage');if(shelf>7)risks.push('retail shelf time');
+   $('vc_mainRisk').textContent=risks.length?`Main risks: ${risks.join(', ')}.`:'No major abnormal risk detected; continue monitoring time and temperature.';
+   $('vc_bestAction').textContent=delay>6?'Move the lot immediately to rapid pre-cooling and shorten the intended storage period.':cold!=='yes'&&transport>12?'Use refrigerated transport with a temperature logger before dispatch.':storage>4?'Reduce storage temperature and verify pulp temperature, humidity and condensation risk.':shelf>7?'Apply FEFO, reduce shelf batch size and consider markdown before quality declines.':'Maintain the cold chain and allocate the lot by predicted remaining shelf life.';
+   $('vc_coldAdvice').textContent=transport>8||life>7?'Yes — refrigerated/temperature-controlled handling is recommended for this scenario. Maintain a stable low temperature and log excursions.':'A full refrigerated chain may be optional for very short local delivery, but minimize time, heat and direct sunlight.';
+   stageScores=[96,Math.round(96-(maturity==='optimal'?0:10)),Math.round(95-(100-care)*.15),Math.round(94-delay*.5),Math.round(93-Math.max(0,storage-2)*1.3),Math.round(92-transport*(cold==='yes'?.015:cold==='partial'?.05:.09)),Math.round(q+shelf*1.1+6),Math.round(q+shelf*.8+4),Math.round(q+shelf*.45+2),q].map(x=>Math.max(35,Math.min(99,x)));
+   vcRenderTimeline(); vcShowStage(0);
+  }
+  function vcRenderTimeline(){let h='';stageDefs.forEach((s,i)=>{let loss=i?Math.max(0,stageScores[i-1]-stageScores[i]):0;h+=`<div class="vc-stage ${i===0?'active':''}" data-i="${i}"><h4>${s[0]}</h4><div class="q">${stageScores[i]}</div><div class="loss">${i?'-'+loss+' quality points':'starting quality'}</div></div>`});$('vc_timeline').innerHTML=h;document.querySelectorAll('#vc_timeline .vc-stage').forEach(x=>x.onclick=()=>{document.querySelectorAll('#vc_timeline .vc-stage').forEach(y=>y.classList.remove('active'));x.classList.add('active');vcShowStage(+x.dataset.i)})}
+  function vcShowStage(i){const s=stageDefs[i];$('vc_stageTitle').textContent=s[0]+' — Quality '+stageScores[i]+'/100';$('vc_stageExplain').textContent='The digital twin estimates quality at this stage and explains which variables caused any loss.';$('vc_stageFactors').textContent=s[1];$('vc_stageActions').textContent=s[2];$('vc_stageAI').textContent=s[3]}
+  function vcAnswer(q){const roleLabel=activeRoleLabel();const quality=+$('vc_quality').textContent;let base=`Current predicted consumer quality is ${quality}/100, with ${$('vc_shelfLife').textContent} remaining and ${$('vc_waste').textContent} waste/spoilage risk.`;let t=q.toLowerCase(),a='';if(t.includes('now'))a=$('vc_bestAction').textContent;else if(t.includes('why'))a=$('vc_mainRisk').textContent+' Quality changes cumulatively from maturity, temperature, delay, handling and shelf time.';else if(t.includes('export'))a=quality>=80&&$('vc_cold').value==='yes'?'This lot is a plausible export candidate, subject to buyer specifications, residue compliance, quality attributes, traceability and transport validation.':'Do not prioritize export yet. Improve cold-chain control or route the lot to a shorter local market.';else if(t.includes('store'))a=`Use the predicted ${$('vc_shelfLife').textContent} as a planning estimate, not a guarantee. Confirm with direct quality and storage-room measurements.`;else if(t.includes('consumer'))a='Keep the product cool, avoid rough handling, and consume/drink within the recommended window.';else a='Maintain time-temperature control, use remaining shelf/aging life for FEFO allocation, and choose the market channel that can consume the lot before quality falls.';return `${base}\n\n${a}\n\nPerspective: ${roleLabel} (set at top of page).`}
+  function vcAddMsg(t,c){let d=document.createElement('div');d.className='vc-msg '+c;d.textContent=t;$('vc_chat').appendChild(d);$('vc_chat').scrollTop=$('vc_chat').scrollHeight}
+  function vcAsk(t){let q=(t||$('vc_question').value).trim();if(!q)return;vcAddMsg(q,'vc-msg-user');$('vc_question').value='';setTimeout(()=>vcAddMsg(vcAnswer(q),'vc-msg-bot'),200)}
+  $('vc_simulate').onclick=vcCalc;
+  document.querySelectorAll('#quality input,#quality select').forEach(e=>e.addEventListener('input',vcCalc));
+  $('vc_send').onclick=()=>vcAsk();
+  $('vc_question').onkeydown=e=>{if(e.key==='Enter')vcAsk()};
+  document.querySelectorAll('#quality .vc-chip').forEach(c=>c.onclick=()=>vcAsk(c.textContent));
+  const gc=document.getElementById('globalCrop'); if(gc) gc.addEventListener('change',onCropChange);
+  const gr=document.getElementById('globalRole'); if(gr) gr.addEventListener('change',refreshRoleBadge);
+  onCropChange();
+  refreshRoleBadge();
+  })();
+  </script>
+
+  <section id="platform" class="view">
+    <div class="grid g3"><div class="card"><h3>Experience layer</h3><p class="muted">Role workspaces, scenario controls, dynamic twins, AI Copilot.</p></div><div class="card"><h3>Intelligence layer</h3><p class="muted">Crop models, quality propagation, recommendations, uncertainty.</p></div><div class="card"><h3>Research layer</h3><p class="muted">Hypotheses, experiments, validation, knowledge reuse.</p></div></div>
+
+    <h3 style="margin-top:22px">LiDO Alignment</h3>
+    <p class="muted">How this platform's architecture maps onto LiDO — Laimburg Integrated Digital Orchard — as documented in Laimburg's own official sources.</p>
+
+    <div class="grid g3" style="margin-top:10px">
+      <div class="card"><h3>LiDO by the numbers</h3><p class="muted">Opened October 2022 · ~40 partner companies, universities and startups · ~1,100 visitors over three Open Days · ERDF co-funded · central InfluxDB time-series data platform with API, dashboards and tokened access.</p></div>
+      <div class="card"><h3>The two field labs</h3><p class="muted"><b>Apple orchard:</b> 0.65 ha, Rosy Glow Pink Lady®, flat multi-axis Guyot canopy built for cameras and robots.<br><b>Vineyard:</b> 0.4 ha Chardonnay, slopes up to 70%, used for worker-safety and mechanisation trials.</p></div>
+      <div class="card"><h3>Top priorities, next 5–10 years</h3><p class="muted">Laimburg's own strategy ranks two priorities "very high": climate adaptation &amp; water management, and AI/robotics/plant-level precision agriculture — the same territory this platform targets.</p></div>
+    </div>
+
+    <div class="notice" style="margin-top:14px"><b>Where this platform fits LiDO's own roadmap:</b> LiDO's stated 2026 focus is the geolocation of individual trees and vines — giving each plant a fixed digital identity. Laimburg's own documentation describes this as a likely foundation for orchard and vineyard <b>digital twins</b>, where every plant carries its location, images, growth, water status, treatments, yield and quality. That is exactly the layer this platform is built to provide — this isn't an outside idea being pitched to LiDO, it lines up with LiDO's own next step.</div>
+
+    <div class="grid g2" style="margin-top:14px">
+      <div class="card"><h3>Already validated in the field at LiDO</h3><p class="muted">Aigritec's robotic harvester and a precision blossom-thinning robot have both been field-tested in the Laimburg orchards — real precedent for the kind of AI-guided field intervention this platform's Scenario Lab models (see the Flower thinning window preset).</p></div>
+      <div class="card"><h3>A proven validation pathway</h3><p class="muted">Printed plant sensors from the Free University of Bozen-Bolzano followed lab → climate chamber → LiDO orchard → prototype improvement before being trusted in the field — the same lab-to-field discipline this platform's Research tab is built around.</p></div>
+    </div>
+  </section>
+
+  <div style="margin-top:18px;padding:12px 16px;border-top:1px solid var(--line);color:var(--muted);font-size:11.5px;line-height:1.5">
+    Discussion prototype only. All scenario values are illustrative rule-based outputs, not measured or validated data. The AI Copilot's answers are generated from the current scenario parameters using transparent, rule-based demo logic prepared for this discussion — not a live predictive model, and not yet validated against real orchard or vineyard data. LiDO facts on this tab are drawn from Laimburg's own published sources; figures are as officially reported and are not independently audited.
+  </div>
+</main>
+</div>
+
+<script>
+const nav=document.querySelectorAll('.nav button'),views=document.querySelectorAll('.view');
+const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
+nav.forEach(b=>b.addEventListener('click',()=>{nav.forEach(x=>x.classList.remove('active'));views.forEach(x=>x.classList.remove('active'));b.classList.add('active');const id=b.dataset.view;document.getElementById(id).classList.add('active');pageTitle.textContent=titles[id][0];pageSub.textContent=titles[id][1];window.scrollTo({top:0,left:0,behavior:'auto'});document.querySelector('.main').scrollTop=0}));
+
+const dimensions=['Environment','Physiology','Field operations','Product quality','Logistics / process','Economics','Sustainability'];
+const stagesApple=['Planning','Growth','Pre-harvest','Harvest','Packing','Storage','Transport','Retail'];
+const stagesVine=['Planning','Growth','Pre-harvest','Harvest','Winery intake','Fermentation','Maturation','Market'];
+function buildMatrix(){
+ const stages=globalCrop.value==='apple'?stagesApple:stagesVine;
+ const x=(typeof state!=='undefined'&&typeof calc==='function')?calc():null;
+ let h='<div class="m-head">Dimension ↓ / Stage →</div>'+stages.map(x=>`<div class="m-head">${x}</div>`).join('');
+ dimensions.forEach((d,di)=>{const atRisk=x?dimensionAtRisk(d,x):false;h+=`<div class="m-side">${d}</div>`;stages.forEach((s,si)=>{const cls=atRisk?'warn':'';h+=`<div class="m-cell ${cls}"><div class="dot"></div><b>${matrixTitle(d,s)}</b><span>${matrixText(d,s)}</span></div>`})});
+ matrixGrid.innerHTML=h;
+}
+function dimensionAtRisk(d,x){
+ if(d==='Environment')return Math.abs(state.temperature)>5||state.vpd>2.5||state.rain>60;
+ if(d==='Physiology')return state.stress>35||state.disease>40||Math.abs(state.cropLoad-100)>20;
+ if(d==='Field operations')return state.harvestDelay>20||state.cooling>20||state.labor<70;
+ if(d==='Product quality')return x.quality<70||x.waste>30;
+ if(d==='Logistics / process')return state.lead>15||state.shelf>8||state.claims>30;
+ if(d==='Economics')return x.value<60||state.price<80;
+ return state.energy>120||state.carbon>120||state.biodiversity<50;
+}
+function matrixTitle(d,s){if(d==='Environment')return 'Climate & microclimate';if(d==='Physiology')return globalCrop.value==='apple'?'Tree / fruit state':'Vine / berry state';if(d==='Field operations')return 'Management action';if(d==='Product quality')return 'Quality state';if(d==='Logistics / process')return 'Flow condition';if(d==='Economics')return 'Value & cost';return 'Resource footprint'}
+function matrixText(d,s){const map={'Environment':'temperature, rain, VPD, light','Physiology':'phenology, stress, maturity','Field operations':'water, canopy, labor, timing','Product quality':'Brix, firmness/acidity, defects','Logistics / process':'delay, temperature, capacity','Economics':'yield, grade, price, cost','Sustainability':'water, energy, carbon, biodiversity'};return map[d]+' at '+s.toLowerCase()}
+
+const groups=[
+ {name:'Environment',items:[['temperature','Temperature anomaly','°C',-5,10,0],['rain','Rainfall','mm',0,100,20],['humidity','Relative humidity','%',30,100,65],['vpd','VPD','kPa',0,4,1.2],['solar','Solar radiation','%',40,130,100],['wind','Wind speed','m/s',0,15,3]]},
+ {name:'Soil & water',items:[['soil','Soil moisture','%',10,50,28],['irrigation','Irrigation','mm',0,40,18],['ec','Soil EC','dS/m',0,3,0.8],['drainage','Drainage index','',0,100,75],['waterCost','Water cost index','',50,150,100]]},
+ {name:'Plant physiology',items:[['phenology','Phenology progress','%',0,100,78],['stress','Plant stress','%',0,100,20],['canopy','Canopy density','%',30,100,72],['cropLoad','Crop load','%',50,140,100],['maturity','Maturity index','%',40,110,82],['disease','Disease pressure','%',0,100,18],['pollenTube','Pollen tube growth to ovary','%',0,100,0]]},
+ {name:'Operations',items:[['labor','Labor availability','%',40,120,90],['spray','Protection effectiveness','%',20,100,82],['harvestDelay','Harvest delay','hours',0,72,6],['handling','Handling quality','%',40,100,92],['cooling','Cooling/process delay','hours',0,48,6]]},
+ {name:'Quality & logistics',items:[['cold','Temperature control','%',20,100,94],['lead','Lead time','days',1,30,7],['shelf','Retail/process time','days',1,20,4],['pack','Pack-out / intake quality','%',40,100,88],['claims','Claim risk','%',0,100,12]]},
+ {name:'Economics & sustainability',items:[['price','Market price index','',60,140,100],['energy','Energy use index','',50,150,100],['carbon','Carbon intensity','',50,150,100],['biodiversity','Biodiversity proxy','',20,100,68],['wasteTarget','Waste reduction target','%',0,50,20]]}
+];
+const state={};
+groups.forEach(g=>g.items.forEach(i=>state[i[0]]=i[5]));
+function renderControls(){
+ controls.innerHTML=groups.map(g=>`<div class="control-group"><h4>${g.name}<span class="badge">${g.items.length} parameters</span></h4>${g.items.map(i=>`<div class="control-row"><div><label for="${i[0]}">${i[1]}</label><input id="${i[0]}" type="range" min="${i[3]}" max="${i[4]}" step="${i[4]-i[3]>20?1:.1}" value="${state[i[0]]}"></div><output id="${i[0]}Out">${state[i[0]]} ${i[2]}</output></div>`).join('')}</div>`).join('');
+ groups.forEach(g=>g.items.forEach(i=>document.getElementById(i[0]).addEventListener('input',e=>{state[i[0]]=+e.target.value;document.getElementById(i[0]+'Out').textContent=state[i[0]]+' '+i[2];updateScenario()})));
+}
+renderControls();
+fieldRows.innerHTML=Array.from({length:14},()=>'<div class="row"></div>').join('');
+
+const personas={
+ grower:{icon:'👩‍🌾',title:'Grower',need:'Timely block-level action with expected benefit and risk.',q:['Where should I act today?','When should I harvest?','How much water or labor is needed?'],o:['Ranked actions by block','Yield/quality effect','Confidence and operational cost'],k:[['Action','Today'],['Risk','Block'],['Yield','Forecast'],['ROI','Expected']]},
+ researcher:{icon:'🔬',title:'Researcher',need:'Transparent variables, uncertainty, experiments, and validation.',q:['Which variables explain the response?','Can the model transfer across sites?','What evidence is missing?'],o:['Model drivers and uncertainty','Experiment suggestion','Validation and provenance'],k:[['Model','Explain'],['Error','Measure'],['Data','Trace'],['Sites','Compare']]},
+ cooperative:{icon:'🏭',title:'Cooperative / Winery',need:'Intake, capacity, lot quality, processing, storage, and claims.',q:['Which lots or parcels arrive first?','What quality remains?','Where is loss occurring?'],o:['Priority intake / FEFO','Quality window','Capacity and claims risk'],k:[['Quality','Remain'],['Window','Time'],['Flow','Priority'],['Claims','Risk']]},
+ technology:{icon:'🧩',title:'Technology Provider',need:'Interfaces, benchmarks, test conditions, and adoption evidence.',q:['How does our device connect?','Which KPI defines success?','Can performance be validated?'],o:['Data/API requirements','Benchmark protocol','Commercial outcome evidence'],k:[['API','Open'],['Trial','Defined'],['KPI','Shared'],['TRL','Advance']]},
+ manager:{icon:'📊',title:'Research Manager',need:'Portfolio priorities, partners, funding, impact, and scale.',q:['Which pilot is most valuable?','Who contributes what?','What is publishable and scalable?'],o:['Pilot portfolio','Role and milestone map','Impact and funding roadmap'],k:[['Pilot','Scope'],['Roles','Clear'],['Impact','Measure'],['Next','Fund']]}
+};
+function renderPersonas(){
+ personaPanel.innerHTML=Object.entries(personas).map(([k,p])=>`<div class="persona ${k===globalRole.value?'active':''}" data-persona="${k}"><div style="font-size:27px">${p.icon}</div><b>${p.title}</b><small>${p.need}</small></div>`).join('');
+ document.querySelectorAll('[data-persona]').forEach(x=>x.addEventListener('click',()=>{globalRole.value=x.dataset.persona;renderPersonas();showPersona();updateScenario()}));showPersona();
+}
+function showPersona(){const p=personas[globalRole.value];personaTitle.textContent=p.title+' perspective';personaNeed.textContent=p.need;personaQuestions.innerHTML=p.q.map(x=>'<li>'+x+'</li>').join('');personaOutputs.innerHTML=p.o.map(x=>'<li>'+x+'</li>').join('');personaKpis.innerHTML=p.k.map(x=>`<div class="metric"><small>${x[0]}</small><b style="font-size:17px">${x[1]}</b></div>`).join('')}
+renderPersonas();
+
+function calc(){
+ const climate=Math.abs(state.temperature)*1.3+Math.max(0,state.vpd-1.2)*7+Math.max(0,state.humidity-80)*.25;
+ const water=Math.max(0,28-state.soil)*1.1+Math.max(0,18-state.irrigation)*.7;
+ const bio=state.stress*.18+state.disease*.22+Math.abs(state.cropLoad-100)*.08;
+ const ops=state.harvestDelay*.18+state.cooling*.35+(100-state.handling)*.22+(100-state.cold)*.25;
+ const chain=state.lead*.28+state.shelf*.35+state.claims*.08;
+ const quality=Math.max(35,96-climate-water-bio-ops-chain*.35+state.pack*.04);
+ const yieldIdx=Math.max(40,104-climate*.45-water*.7-bio*.5-Math.max(0,100-state.labor)*.2);
+ const waterEff=Math.max(30,96-Math.abs(state.irrigation-18)*1.2-Math.max(0,state.vpd-1.5)*5+(state.drainage-75)*.08);
+ const waste=Math.max(2,100-quality+state.cooling*.25+state.lead*.25);
+ const value=Math.max(30,(quality*.55+yieldIdx*.35+state.price*.1)-Math.max(0,state.energy-100)*.08);
+ const conf=Math.max(.42,Math.min(.94,.82-(state.disease+state.stress)*.0015-Math.abs(state.temperature)*.006));
+ return {quality,yieldIdx,waterEff,waste,value,conf}
+}
+function updateScenario(){
+ const x=calc();rQuality.textContent=Math.round(x.quality);rYield.textContent=Math.round(x.yieldIdx);rWater.textContent=Math.round(x.waterEff)+'%';rWaste.textContent=x.waste<18?'Low':x.waste<35?'Medium':'High';rValue.textContent=Math.round(x.value);rConfidence.textContent=x.conf.toFixed(2);
+ const risk=x.waste<18?'Low':x.waste<35?'Medium':'High';riskLabel.textContent='Stress / loss risk: '+risk;scenarioStatus.textContent=risk==='Low'?'Controlled scenario':risk==='Medium'?'Attention needed':'High-risk scenario';
+ sun.style.transform=`scale(${1+Math.max(0,state.temperature)/20})`;document.querySelectorAll('.row').forEach(r=>{r.style.opacity=Math.max(.45,1-state.stress/160);r.style.filter=`saturate(${Math.max(.45,1-state.disease/140)})`});
+ fieldLabel.textContent=(globalCrop.value==='apple'?'Block A3':'Parcel V2')+' · maturity '+Math.round(state.maturity)+'%';sceneTitle.textContent=globalCrop.value==='apple'?'Apple Digital Twin':'Vineyard Digital Twin';
+ const p=personas[globalRole.value];stakeholderName.textContent=p.title+' recommendation:';
+ recommendation.textContent=recommendationFor(globalRole.value,x);
+ renderLifecycle(x);
+ buildMatrix();
+}
+function recommendationFor(role,x){
+ if(role==='grower')return x.waste>35?'Reduce harvest and cooling delays; prioritize the highest-risk block.':x.waterEff<70?'Adjust irrigation using soil moisture and VPD before the next cycle.':'Maintain current management and monitor maturity and stress.';
+ if(role==='researcher')return x.conf<.65?'Collect additional physiology measurements before validating the recommendation.':'Test the two strongest model drivers with a controlled block comparison.';
+ if(role==='cooperative')return x.waste>25?'Prioritize this lot/parcel for intake, cooling, processing, or FEFO rotation.':'Current intake and storage/process plan remains acceptable.';
+ if(role==='technology')return 'Benchmark sensor/model performance against quality, water, and intervention KPIs in one defined pilot block.';
+ return 'Prioritize a one-season pilot with measurable scientific, grower, and sustainability outcomes.';
+}
+
+// --- Grounded answer engine -------------------------------------------
+// Transparent, rule-based responder: every answer is built from the actual
+// current scenario values (not free-form generation), and every answer says
+// which values it used. It intentionally does NOT pretend to be a live
+// predictive model.
+function groundingLine(keys){
+ return '<br><small style="color:var(--muted)">Grounded in: '+keys.join(', ')+' — rule-based demo logic using the current scenario, not a live predictive model.</small>';
+}
+function answerQuery(qRaw,role,x){
+ const q=(qRaw||'').toLowerCase();
+ const has=(...w)=>w.some(t=>q.includes(t));
+
+ if(has('irrigat','water','soil moisture','vpd','drought')){
+  const need=state.soil<22?'increase irrigation and reduce exposure to high VPD':state.irrigation>state.soil+6?'ease off irrigation slightly to avoid over-watering':'hold the current irrigation plan';
+  return `Soil moisture is ${Math.round(state.soil)}%, irrigation ${Math.round(state.irrigation)} mm, VPD ${state.vpd.toFixed(1)} kPa, and water efficiency is ${Math.round(x.waterEff)}%. Suggested action: ${need}.`+groundingLine(['soil moisture','irrigation','VPD','water efficiency']);
+ }
+ if(has('harvest','pick','maturity','ripe','timing')){
+  const status=state.maturity>=92?'at or past the optimal picking window':state.maturity>=80?'approaching the optimal window':'not yet ready';
+  return `Maturity index is ${Math.round(state.maturity)}%, which is ${status}. Quality forecast is ${Math.round(x.quality)}, with ${x.waste<18?'low':x.waste<35?'medium':'high'} downstream waste risk.`+groundingLine(['maturity index','quality forecast','waste risk']);
+ }
+ if(has('thin','crop load','growth regulat','canopy','pruning','pollen','bloom')){
+  const note=state.cropLoad>110?'crop load is running high — a stronger thinning intervention may be worth considering':state.cropLoad<85?'crop load is light relative to target — thinning intensity could be reduced':'crop load is close to target';
+  const tubeNote=state.pollenTube>0?` Pollen tube growth is estimated at ${Math.round(state.pollenTube)}% of the way to the ovary — the classical chemical-thinning window narrows as fertilization completes.`:'';
+  return `Crop load is ${Math.round(state.cropLoad)}% of target and canopy density is ${Math.round(state.canopy)}%.${tubeNote} ${note}.`+groundingLine(state.pollenTube>0?['crop load','canopy density','pollen tube growth']:['crop load','canopy density']);
+ }
+ if(has('disease','pest','scab','fire blight','protection','spray')){
+  const risk=state.disease>50?'high':state.disease>25?'moderate':'low';
+  return `Disease pressure is ${risk} (${Math.round(state.disease)}%), with protection effectiveness estimated at ${Math.round(state.spray)}%. ${state.disease>50?'Consider tightening the protection schedule on the highest-pressure blocks.':'Current protection level looks adequate for this scenario.'}`+groundingLine(['disease pressure','protection effectiveness']);
+ }
+ if(has('storage','shelf','window','process time','cold chain','cooling')){
+  const win=x.waste<18?'about three weeks':x.waste<35?'about ten days':'under five days';
+  return `Estimated remaining quality window is ${win}, shaped by a cooling delay of ${Math.round(state.cooling)}h and temperature control at ${Math.round(state.cold)}%.`+groundingLine(['waste risk','cooling delay','temperature control']);
+ }
+ if(has('compare','scenario','alternative','versus',' vs ')){
+  return `The active ${globalCrop.value} scenario shows quality ${Math.round(x.quality)}, yield index ${Math.round(x.yieldIdx)}, and value index ${Math.round(x.value)}. Try the Heat wave, Wet disease period, Harvest/logistics delay, or Resource-efficient presets in Scenario Lab to compare outcomes side by side.`+groundingLine(['quality','yield index','value index']);
+ }
+ if(has('confiden','uncertain','validat','evidence','reliable')){
+  return `Model confidence is ${x.conf.toFixed(2)} on a 0–1 scale, currently reduced mainly by disease pressure (${Math.round(state.disease)}%) and plant stress (${Math.round(state.stress)}%). In a real deployment this would still need cross-site validation before informing decisions.`+groundingLine(['confidence score','disease pressure','plant stress']);
+ }
+ if(has('pilot','experiment','trial','study design')){
+  return `A minimal first pilot: one crop, one block or parcel, one season, one measurable outcome — for example, validating the maturity/quality relationship shown here against real fruit sampling before expanding further.`+groundingLine(['maturity index','quality forecast']);
+ }
+ if(has('cost','price','economic','value','roi','return')){
+  return `Value index is ${Math.round(x.value)}, combining quality (${Math.round(x.quality)}), yield (${Math.round(x.yieldIdx)}), and the current market price index (${Math.round(state.price)}).`+groundingLine(['value index','quality','yield index','price index']);
+ }
+ if(has('carbon','energy','sustainab','biodiversity','emission')){
+  return `Energy use index is ${Math.round(state.energy)}, carbon intensity ${Math.round(state.carbon)}, and the biodiversity proxy is ${Math.round(state.biodiversity)}.`+groundingLine(['energy use','carbon intensity','biodiversity proxy']);
+ }
+ if(has('lot','intake','parcel first','claims')){
+  return `Waste/loss risk is ${x.waste<18?'low':x.waste<35?'medium':'high'} (index ${Math.round(x.waste)}), with claim risk tracked at ${Math.round(state.claims)}%. ${x.waste>25?'Prioritize the current block/lot for intake, cooling, or FEFO rotation.':'Current intake order can follow the standard plan.'}`+groundingLine(['waste risk','claim risk']);
+ }
+ if(has('risk','attention','priorit','should i do','what to do','today','act now')){
+  return `The largest current risk is ${x.waste>25?'downstream quality loss driven by delay and cooling/handling conditions':'moderate field-level stress rather than downstream handling'}. Quality ${Math.round(x.quality)}, water efficiency ${Math.round(x.waterEff)}%, confidence ${x.conf.toFixed(2)}.`+groundingLine(['quality','water efficiency','confidence']);
+ }
+ return `${recommendationFor(role,x)}<br><small style="color:var(--muted)">This demo doesn't yet recognize that exact question — try asking about irrigation, harvest timing, thinning, disease risk, storage window, confidence, or comparing scenarios.</small>`;
+}
+function renderLifecycle(x){
+ const stages=globalCrop.value==='apple'?stagesApple:stagesVine;let q=x.quality+8;
+ lifecycle.innerHTML=stages.map((s,i)=>{q=Math.max(20,q-(i*(100-state.cold)/180)-(state.lead/18));return `<div class="stage"><b>${s}</b><small>Quality ${Math.round(q)}</small><div class="qbar"><span style="width:${q}%"></span></div></div>`}).join('');
+ if(document.getElementById('qualityLifecycle')) qualityLifecycle.innerHTML=lifecycle.innerHTML;
+}
+updateScenario();
+
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.preset;if(p==='heat'){Object.assign(state,{temperature:7,vpd:3.2,soil:18,stress:62,irrigation:12})}if(p==='wet'){Object.assign(state,{rain:85,humidity:94,disease:68,solar:55,handling:78})}if(p==='delay'){Object.assign(state,{harvestDelay:36,cooling:26,cold:62,lead:18,shelf:10})}if(p==='efficient'){Object.assign(state,{irrigation:17,waterCost:85,energy:78,carbon:76,biodiversity:82,wasteTarget:35})}if(p==='thinning'){Object.assign(state,{temperature:4,vpd:0.8,humidity:70,solar:105,phenology:16,canopy:40,cropLoad:130,stress:10,disease:8,pollenTube:62})}if(p==='lido'){Object.assign(state,{canopy:58,disease:12,spray:92,stress:18,labor:88,cooling:4,harvestDelay:2,cold:96,handling:90})}renderControls();updateScenario();if(p==='thinning'){stakeholderName.textContent='Flower thinning decision:';recommendation.textContent='Warm bloom weather ('+Math.round(state.temperature)+'°C above normal) is speeding up pollen tube growth — tubes are already an estimated '+Math.round(state.pollenTube)+'% of the way to the ovary. Crop load is running high ('+Math.round(state.cropLoad)+'% of target). The classical thinning window closes once fertilization completes, so a chemical or mechanical thinning decision is time-sensitive here.'}if(p==='lido'){stakeholderName.textContent='LiDO reference site:';recommendation.textContent="Modeled on Laimburg's own LiDO field labs — a 0.65 ha Rosy Glow Pink Lady® apple orchard on a flat, multi-axis Guyot canopy built for cameras and robots, and a 0.4 ha Chardonnay vineyard on slopes up to 70%. Both sites already run fixed precision-spraying, automated irrigation, fibre-optic connectivity and a central InfluxDB data platform — the well-instrumented, low-uncertainty baseline this scenario reflects."}}));
+resetBtn.addEventListener('click',()=>{groups.forEach(g=>g.items.forEach(i=>state[i[0]]=i[5]));renderControls();updateScenario()});
+globalCrop.addEventListener('change',()=>{buildMatrix();updateScenario()});globalRole.addEventListener('change',()=>{renderPersonas();updateScenario()});
+
+chatSend.addEventListener('click',()=>{const q=chatInput.value.trim();if(!q)return;const u=document.createElement('div');u.className='msg user';u.textContent=q;chat.appendChild(u);chatInput.value='';const x=calc();setTimeout(()=>{const a=document.createElement('div');a.className='msg ai';a.innerHTML=`<b>${copilotObjective.value} · ${copilotStyle.value}</b><br>${answerQuery(q,globalRole.value,x)}<br><small>Risk tolerance: ${copilotRisk.value}.</small>`;chat.appendChild(a);chat.scrollTop=chat.scrollHeight},220)});
+chatInput.addEventListener('keydown',e=>{if(e.key==='Enter')chatSend.click()});
+
+// v2.2 dynamic home
+homeFieldRows.innerHTML=Array.from({length:14},()=>'<div class="row"></div>').join('');
+
+const homeRoleContent={
+ grower:{icon:'👩‍🌾',title:'Grower workspace',subtitle:'Act at the right place and time.',mission:'See block priorities, expected outcomes, and practical next actions.',focus:['Today’s ranked field actions','Harvest, irrigation, disease and labor decisions','Expected quality, yield, cost and confidence']},
+ researcher:{icon:'🔬',title:'Researcher workspace',subtitle:'Evidence, uncertainty, and validation.',mission:'Validate models, compare evidence, and turn observations into reusable knowledge.',focus:['Transparent model drivers and uncertainty','Experiment design and cross-site comparison','Data provenance and scientific validation']},
+ cooperative:{icon:'🏭',title:'Cooperative / winery workspace',subtitle:'Coordinate intake, quality, and capacity.',mission:'Prioritize lots or parcels and protect value through storage or processing.',focus:['Incoming quality and remaining window','Capacity, FEFO, processing and claims risk','Traceability from field to market']},
+ technology:{icon:'🧩',title:'Technology partner workspace',subtitle:'Integrate, benchmark, and validate.',mission:'Connect sensors, robots, imaging, and decision tools to measurable outcomes.',focus:['API and data requirements','Defined trials and shared benchmarks','Commercial adoption evidence']},
+ manager:{icon:'📊',title:'Research manager workspace',subtitle:'Build a credible portfolio of pilots.',mission:'Align partners, milestones, funding, scientific impact, and scale.',focus:['Pilot portfolio and resource priorities','Partner roles and measurable impact','Publication, funding and scaling pathway']}
+};
+const homeRoleOrder=['grower','researcher','cooperative','technology','manager'];
+let homeRoleIndex=Math.max(0,homeRoleOrder.indexOf(globalRole.value));
+
+const quickByRole={
+ grower:['What should I do today?','Which block first?','Optimize irrigation'],
+ researcher:['Explain model uncertainty','Design an experiment','Compare two scenarios'],
+ cooperative:['Prioritize incoming lots','Show quality window','Reduce claims risk'],
+ technology:['Define validation KPI','Show integration needs','Create benchmark trial'],
+ manager:['Rank pilot opportunities','Show partner roles','Prepare impact brief']
+};
+const homeFeatures=[
+ {view:'scenario',icon:'🎛',title:'Scenario Laboratory',desc:'Change 30+ field-to-market variables and compare outcomes.',live:'Interactive',meter:88},
+ {view:'scenario',icon:'🌳',title:'Living Field Twin',desc:'Visualize stress, maturity, sensors, weather, and interventions.',live:'Simulated',meter:78},
+ {view:'quality',icon:'📦',title:'Quality & Value Chain',desc:'Propagate field decisions into quality, waste, and value.',live:'10 stages',meter:84},
+ {view:'matrix',icon:'🧭',title:'Digital Twin Matrix',desc:'Explore 8 lifecycle stages across 7 decision dimensions.',live:'56 cells',meter:74},
+ {view:'research',icon:'🔬',title:'Research Workspace',desc:'Move from hypothesis and experiment to validation and knowledge.',live:'Live builder',meter:63},
+ {view:'copilot',icon:'🤖',title:'User-defined Copilot',desc:'Configure role, objective, explanation style, and risk tolerance.',live:'Role-aware',meter:92},
+ {view:'stakeholders',icon:'👥',title:'Stakeholder Workspaces',desc:'Grower, researcher, cooperative, technology, and manager views.',live:'5 users',meter:80},
+ {view:'platform',icon:'🌍',title:'International Platform',desc:'Modular architecture for sites, crops, partners, and shared models.',live:'Scalable',meter:69}
+];
+function switchView(id){
+ const btn=[...nav].find(x=>x.dataset.view===id);
+ if(btn)btn.click();
+}
+function renderHomeRole(){
+ const role=homeRoleOrder[homeRoleIndex];
+ if(globalRole.value!==role)globalRole.value=role;
+ const p=homeRoleContent[role];
+ dynamicGreeting.textContent='Good morning, '+p.title.replace(' workspace','')+'.';
+ dynamicMission.textContent=p.mission;
+ homeRoleTitle.textContent=p.title;
+ homeRoleSubtitle.textContent=p.subtitle;
+ roleFeatureStage.innerHTML=`<div class="role-hero-icon">${p.icon}</div><h4>${p.subtitle}</h4><p>${p.mission}</p><div class="role-focus-list">${p.focus.map(x=>`<div class="role-focus">${x}</div>`).join('')}</div>`;
+ roleDots.innerHTML=homeRoleOrder.map((r,i)=>`<button class="${i===homeRoleIndex?'active':''}" data-role-index="${i}" aria-label="${homeRoleContent[r].title}"></button>`).join('');
+ document.querySelectorAll('[data-role-index]').forEach(b=>b.addEventListener('click',()=>{homeRoleIndex=+b.dataset.roleIndex;renderHomeRole();renderPersonas();updateScenario();renderQuickPrompts()}));
+ renderQuickPrompts();
+ renderCopilotChips();
+}
+function renderQuickPrompts(){
+ const role=homeRoleOrder[homeRoleIndex];
+ quickPrompts.innerHTML=quickByRole[role].map(q=>`<button data-quick-home="${q}">${q}</button>`).join('');
+ document.querySelectorAll('[data-quick-home]').forEach(b=>b.addEventListener('click',()=>{homeCommandInput.value=b.dataset.quickHome;runHomeQuestion(b.dataset.quickHome)}));
+}
+function renderCopilotChips(){
+ const role=homeRoleOrder[homeRoleIndex];
+ copilotChips.innerHTML=quickByRole[role].map(q=>`<button data-quick-copilot="${q}">${q}</button>`).join('');
+ document.querySelectorAll('[data-quick-copilot]').forEach(b=>b.addEventListener('click',()=>{chatInput.value=b.dataset.quickCopilot;chatSend.click()}));
+}
+cycleRole.addEventListener('click',()=>{homeRoleIndex=(homeRoleIndex+1)%homeRoleOrder.length;renderHomeRole();renderPersonas();updateScenario()});
+globalRole.addEventListener('change',()=>{homeRoleIndex=Math.max(0,homeRoleOrder.indexOf(globalRole.value));renderHomeRole()});
+
+majorFeatureGrid.innerHTML=homeFeatures.map(f=>`<button class="feature-tile" data-feature-view="${f.view}"><span class="ft-live">${f.live}</span><div class="ft-icon">${f.icon}</div><h4>${f.title}</h4><p>${f.desc}</p><div class="ft-meter"><span style="width:${f.meter}%"></span></div></button>`).join('');
+document.querySelectorAll('[data-feature-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.featureView)));
+document.querySelectorAll('[data-home-action]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.homeAction)));
+
+function renderHomeDynamic(){
+ const x=calc(),crop=globalCrop.value,role=globalRole.value;
+ orbitCrop.textContent=crop.toUpperCase();
+ orbitStatus.textContent=x.waste<18?'Controlled':x.waste<35?'Attention':'High risk';
+ homeFieldLabel.textContent=(crop==='apple'?'Block A3':'Parcel V2')+' · maturity '+Math.round(state.maturity)+'%';
+ homeRiskLabel.textContent='Risk: '+(x.waste<18?'Low':x.waste<35?'Medium':'High');
+ homeSun.style.transform=`scale(${1+Math.max(0,state.temperature)/20})`;
+ weatherStrip.innerHTML=`<span>${Math.round(24+state.temperature)}°C</span><span>VPD ${state.vpd.toFixed(1)}</span><span>Soil ${Math.round(state.soil)}%</span><span>Rain ${Math.round(state.rain)} mm</span>`;
+ signalStrip.innerHTML=[
+  ['Quality',Math.round(x.quality)],
+  ['Yield',Math.round(x.yieldIdx)],
+  ['Water',Math.round(x.waterEff)+'%'],
+  ['Confidence',x.conf.toFixed(2)]
+ ].map(v=>`<div class="signal-chip"><small>${v[0]}</small><b>${v[1]}</b></div>`).join('');
+}
+function runHomeQuestion(q){
+ const x=calc(),role=globalRole.value;
+ const ans=answerQuery(q,role,x);
+ homeAnswer.innerHTML='<b>'+homeRoleContent[role].title+':</b><br>'+ans;
+}
+homeCommandRun.addEventListener('click',()=>runHomeQuestion(homeCommandInput.value.trim()||'What requires attention now?'));
+homeCommandInput.addEventListener('keydown',e=>{if(e.key==='Enter')homeCommandRun.click()});
+document.querySelectorAll('[data-home-question]').forEach(b=>b.addEventListener('click',()=>runHomeQuestion(b.dataset.homeQuestion)));
+
+const originalUpdateScenario=updateScenario;
+updateScenario=function(){originalUpdateScenario();renderHomeDynamic()};
+globalCrop.addEventListener('change',renderHomeDynamic);
+renderHomeRole();
+renderHomeDynamic();
+
+</script>
+</body>
+</html>

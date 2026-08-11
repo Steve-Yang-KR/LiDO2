@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>International Digital Twin Platform v2.2 — Python Scenario Engine</title>
+<title>International Digital Twin Platform v2.3 — System Validation</title>
 <style>
 :root{
   --bg:#edf3ef;--panel:#fff;--ink:#163029;--muted:#687972;--line:#d9e5dd;
@@ -53,8 +53,11 @@ button,input,select{font:inherit}
 .persona-panel{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.persona{padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer}.persona.active{border-color:var(--accent);background:var(--soft)}.persona b{display:block;margin-top:4px}.persona small{color:var(--muted)}
 .copilot{display:grid;grid-template-rows:auto 1fr auto;height:470px}.chat{overflow:auto}.msg{max-width:84%;padding:10px 12px;border-radius:13px;margin:8px 0;line-height:1.45}.msg.ai{background:#f2f7f4;border:1px solid var(--line)}.msg.user{margin-left:auto;background:var(--accent);color:#fff}.chatinput{display:flex;gap:8px}.chatinput input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px}.chatinput button,.primary{border:0;background:var(--accent);color:#fff;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}
 .table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);font-size:12px}
+.api-health{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:11px;font-weight:900}.api-health::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--warn)}.api-health.connected{color:#175d42;background:var(--soft)}.api-health.connected::before{background:var(--ok)}.api-health.disconnected{color:var(--danger);background:#fff3f1}.api-health.disconnected::before{background:var(--danger)}
+.validation-hero{display:flex;justify-content:space-between;gap:18px;align-items:center;background:linear-gradient(135deg,#174c3d,#1f7a57 60%,#34737c);color:#fff;border-radius:22px;padding:22px}.validation-hero h3{font-size:27px;margin:6px 0}.validation-hero p{margin:0;opacity:.84;max-width:720px;line-height:1.5}.validation-actions{display:flex;gap:8px;flex-wrap:wrap}.validation-actions button,.validation-actions a{border:0;border-radius:11px;padding:10px 14px;background:#fff;color:var(--ink);font-weight:900;cursor:pointer;text-decoration:none;white-space:nowrap}.validation-actions a{background:rgba(255,255,255,.13);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.validation-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:13px}.validation-summary .metric b{font-size:20px}.validation-list{display:grid;gap:9px;margin-top:13px}.validation-test{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:14px;background:#fff}.validation-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#f1f5f2;font-weight:900;color:var(--muted)}.validation-test.running .validation-icon{background:#fff6e7;color:var(--warn)}.validation-test.pass .validation-icon{background:var(--soft);color:var(--ok)}.validation-test.fail .validation-icon{background:#fff0ee;color:var(--danger)}.validation-test b,.validation-test small{display:block}.validation-test small{color:var(--muted);margin-top:3px;line-height:1.4}.validation-state{font-size:11px;font-weight:900;text-transform:uppercase;color:var(--muted)}.validation-test.pass .validation-state{color:var(--ok)}.validation-test.fail .validation-state{color:var(--danger)}
 @media(max-width:1100px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:relative}.nav{grid-template-columns:repeat(4,1fr)}.hero,.g2,.g3,.g4,.scenario-layout{grid-template-columns:1fr}.persona-panel{grid-template-columns:1fr 1fr}.results{grid-template-columns:repeat(3,1fr)}.lifecycle{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:680px){.main{padding:11px}.nav{grid-template-columns:1fr 1fr}.topbar{align-items:flex-start;flex-direction:column}.hero h2{font-size:29px}.persona-panel,.results,.lifecycle{grid-template-columns:1fr}}
+@media(max-width:680px){.main{padding:11px}.nav{grid-template-columns:1fr 1fr}.topbar{align-items:flex-start;flex-direction:column}.hero h2{font-size:29px}.persona-panel,.results,.lifecycle,.validation-summary{grid-template-columns:1fr}.validation-hero{align-items:flex-start;flex-direction:column}.validation-test{grid-template-columns:42px 1fr}.validation-state{grid-column:2}}
 
 /* v2.2 dynamic home */
 .home-command{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;background:linear-gradient(135deg,#174c3d,#1f7a57 58%,#34737c);color:#fff;border-radius:22px;padding:22px;overflow:hidden}
@@ -91,6 +94,7 @@ button,input,select{font:inherit}
     <button data-view="research">🔬 Research</button>
     <button data-view="copilot">🤖 AI Copilot</button>
     <button data-view="stakeholders">👥 Stakeholders</button>
+    <button data-view="validation">✅ System Validation</button>
     <button data-view="platform">⚙ Architecture</button>
   </nav>
 </aside>
@@ -98,7 +102,7 @@ button,input,select{font:inherit}
 <main class="main">
   <div class="topbar">
     <div><h2 id="pageTitle">Platform overview</h2><p id="pageSub">Explore wider lifecycle dimensions and deeper stakeholder-specific controls.</p></div>
-    <div class="rolebar"><select id="globalCrop"><option value="apple">Apple</option><option value="vineyard">Vineyard</option></select><select id="globalRole"><option value="grower">Grower</option><option value="researcher">Researcher</option><option value="cooperative">Cooperative / Winery</option><option value="technology">Technology Provider</option><option value="manager">Research Manager</option></select><div class="avatar">RS</div></div>
+    <div class="rolebar"><span class="api-health" id="globalApiHealth" title="Checking /health">API checking</span><select id="globalCrop"><option value="apple">Apple</option><option value="vineyard">Vineyard</option></select><select id="globalRole"><option value="grower">Grower</option><option value="researcher">Researcher</option><option value="cooperative">Cooperative / Winery</option><option value="technology">Technology Provider</option><option value="manager">Research Manager</option></select><div class="avatar">RS</div></div>
   </div>
 
   <section id="home" class="view active">
@@ -551,6 +555,36 @@ button,input,select{font:inherit}
     </div>
   </section>
 
+  <section id="validation" class="view">
+    <div class="validation-hero">
+      <div>
+        <span class="badge">Live API verification</span>
+        <h3>System Validation Dashboard</h3>
+        <p>Run the same critical checks used by the automated test suite against this deployed Python service. No production data is changed.</p>
+      </div>
+      <div class="validation-actions">
+        <button id="runValidation">Run all checks</button>
+        <a href="/api/docs" target="_blank" rel="noopener">Open API docs</a>
+      </div>
+    </div>
+
+    <div class="validation-summary">
+      <div class="metric"><small>Python API</small><b id="validationApiState">Not checked</b><em id="validationApiDetail">Run validation to connect</em></div>
+      <div class="metric"><small>Checks passed</small><b id="validationPassCount">0 / 4</b><em>Required scenarios</em></div>
+      <div class="metric"><small>Engine version</small><b id="validationEngineVersion">—</b><em>Reported by API</em></div>
+      <div class="metric"><small>Last checked</small><b id="validationLastRun">—</b><em>Local browser time</em></div>
+    </div>
+
+    <div class="validation-list" id="validationList">
+      <div class="validation-test" data-validation="baseline"><div class="validation-icon">1</div><div><b>Default scenario profile</b><small>Quality and yield above 80, Medium waste risk, confidence at least 0.70.</small></div><span class="validation-state">Pending</span></div>
+      <div class="validation-test" data-validation="heat"><div class="validation-icon">2</div><div><b>Heat Wave impact</b><small>Quality, yield and confidence must all be lower than the default scenario.</small></div><span class="validation-state">Pending</span></div>
+      <div class="validation-test" data-validation="camel"><div class="validation-icon">3</div><div><b>Frontend camelCase compatibility</b><small>The API accepts cropLoad, waterCost and harvestDelay without schema errors.</small></div><span class="validation-state">Pending</span></div>
+      <div class="validation-test" data-validation="range"><div class="validation-icon">4</div><div><b>Out-of-range rejection</b><small>Temperature 30 °C must be rejected with HTTP 422.</small></div><span class="validation-state">Pending</span></div>
+    </div>
+
+    <div class="notice" id="validationNotice" style="margin-top:13px"><b>Ready:</b> click “Run all checks” to verify the deployed service. Results are evaluated in this browser using live API responses.</div>
+  </section>
+
   <div style="margin-top:18px;padding:12px 16px;border-top:1px solid var(--line);color:var(--muted);font-size:11.5px;line-height:1.5">
     Discussion prototype only. All scenario values are illustrative rule-based outputs, not measured or validated data. The AI Copilot's answers are generated from the current scenario parameters using transparent, rule-based demo logic prepared for this discussion — not a live predictive model, and not yet validated against real orchard or vineyard data. LiDO facts on this tab are drawn from Laimburg's own published sources; figures are as officially reported and are not independently audited.
   </div>
@@ -559,8 +593,114 @@ button,input,select{font:inherit}
 
 <script>
 const nav=document.querySelectorAll('.nav button'),views=document.querySelectorAll('.view');
-const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
+const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],validation:['System Validation','Verify the deployed Python API with live browser-based checks.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
 nav.forEach(b=>b.addEventListener('click',()=>{nav.forEach(x=>x.classList.remove('active'));views.forEach(x=>x.classList.remove('active'));b.classList.add('active');const id=b.dataset.view;document.getElementById(id).classList.add('active');pageTitle.textContent=titles[id][0];pageSub.textContent=titles[id][1];window.scrollTo({top:0,left:0,behavior:'auto'});document.querySelector('.main').scrollTop=0}));
+
+const globalApiHealthEl=document.getElementById('globalApiHealth');
+function setGlobalApiState(state,detail){
+ globalApiHealthEl.className='api-health '+state;
+ globalApiHealthEl.textContent=state==='connected'?'Python API connected':state==='disconnected'?'Python API unavailable':'API checking';
+ globalApiHealthEl.title=detail||'';
+}
+async function fetchJson(url,options){
+ const response=await fetch(url,options);
+ const body=await response.text();
+ let payload=null;
+ if(body){try{payload=JSON.parse(body)}catch(error){throw new Error('Invalid JSON response from '+url)}}
+ return {response,payload};
+}
+async function probeApiHealth(){
+ setGlobalApiState('checking','Checking /health');
+ try{
+  const {response,payload}=await fetchJson('/health',{headers:{Accept:'application/json'}});
+  if(!response.ok||!payload||payload.status!=='ok')throw new Error('Health check returned HTTP '+response.status);
+  setGlobalApiState('connected','Health check OK · index '+(payload.index_available?'available':'missing'));
+  return true;
+ }catch(error){
+  setGlobalApiState('disconnected',error.message);
+  return false;
+ }
+}
+
+const validationButtonEl=document.getElementById('runValidation');
+const validationPassCountEl=document.getElementById('validationPassCount');
+const validationApiStateEl=document.getElementById('validationApiState');
+const validationApiDetailEl=document.getElementById('validationApiDetail');
+const validationEngineVersionEl=document.getElementById('validationEngineVersion');
+const validationLastRunEl=document.getElementById('validationLastRun');
+const validationNoticeEl=document.getElementById('validationNotice');
+function setValidationTest(id,status,detail){
+ const row=document.querySelector('[data-validation="'+id+'"]');
+ row.className='validation-test '+status;
+ row.querySelector('.validation-icon').textContent=status==='pass'?'✓':status==='fail'?'!':'…';
+ row.querySelector('.validation-state').textContent=status==='pass'?'Pass':status==='fail'?'Fail':'Running';
+ if(detail)row.querySelector('small').textContent=detail;
+}
+function formatMetric(value,digits){return Number.isFinite(value)?Number(value).toFixed(digits):'—'}
+async function runSystemValidation(){
+ validationButtonEl.disabled=true;
+ validationButtonEl.textContent='Running checks…';
+ validationPassCountEl.textContent='0 / 4';
+ validationEngineVersionEl.textContent='—';
+ validationNoticeEl.innerHTML='<b>Running:</b> live requests are being sent to the deployed Python API.';
+ ['baseline','heat','camel','range'].forEach(id=>setValidationTest(id,'running','Waiting for API response…'));
+ let passed=0,baseline=null,apiResponded=false;
+ const healthOk=await probeApiHealth();
+ validationApiStateEl.textContent=healthOk?'Connected':'Health check failed';
+ validationApiDetailEl.textContent=globalApiHealthEl.title||'/health did not respond';
+
+ try{
+  const {response,payload}=await fetchJson('/api/scenarios/evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  apiResponded=true;
+  const ok=response.status===200&&payload&&payload.quality>80&&payload.yieldIndex>80&&payload.wasteRisk==='Medium'&&payload.confidence>=.7;
+  if(!ok)throw new Error('Expected HTTP 200 and the default KPI profile');
+  baseline=payload;
+  passed+=1;
+  validationEngineVersionEl.textContent=payload.engineVersion||'unknown';
+  setValidationTest('baseline','pass','HTTP 200 · quality '+formatMetric(payload.quality,1)+' · yield '+formatMetric(payload.yieldIndex,1)+' · confidence '+formatMetric(payload.confidence,2));
+ }catch(error){setValidationTest('baseline','fail',error.message)}
+
+ try{
+  const heatPayload={temperature:7,vpd:3.2,soil:18,irrigation:12,stress:62};
+  const {response,payload}=await fetchJson('/api/scenarios/evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(heatPayload)});
+  apiResponded=true;
+  if(!baseline)throw new Error('Default scenario was unavailable for comparison');
+  const ok=response.status===200&&payload&&payload.quality<baseline.quality&&payload.yieldIndex<baseline.yieldIndex&&payload.confidence<baseline.confidence;
+  if(!ok)throw new Error('Heat Wave did not reduce all three target KPIs');
+  passed+=1;
+  setValidationTest('heat','pass','Quality '+formatMetric(baseline.quality,1)+' → '+formatMetric(payload.quality,1)+' · yield '+formatMetric(baseline.yieldIndex,1)+' → '+formatMetric(payload.yieldIndex,1)+' · confidence '+formatMetric(baseline.confidence,2)+' → '+formatMetric(payload.confidence,2));
+ }catch(error){setValidationTest('heat','fail',error.message)}
+
+ try{
+  const camelPayload={cropLoad:120,waterCost:90,harvestDelay:12};
+  const {response,payload}=await fetchJson('/api/scenarios/evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(camelPayload)});
+  apiResponded=true;
+  if(response.status!==200||!payload)throw new Error('Expected HTTP 200, received '+response.status);
+  passed+=1;
+  setValidationTest('camel','pass','HTTP 200 · camelCase fields accepted · quality '+formatMetric(payload.quality,1));
+ }catch(error){setValidationTest('camel','fail',error.message)}
+
+ try{
+  const {response}=await fetchJson('/api/scenarios/evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({temperature:30})});
+  apiResponded=true;
+  if(response.status!==422)throw new Error('Expected HTTP 422, received '+response.status);
+  passed+=1;
+  setValidationTest('range','pass','HTTP 422 · temperature 30 °C rejected as expected');
+ }catch(error){setValidationTest('range','fail',error.message)}
+
+ if(apiResponded){
+  setGlobalApiState('connected','Scenario API responded to validation');
+  validationApiStateEl.textContent='Connected';
+  validationApiDetailEl.textContent='Live scenario endpoint responded';
+ }
+ validationPassCountEl.textContent=passed+' / 4';
+ validationLastRunEl.textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+ validationNoticeEl.innerHTML=passed===4?'<b>All checks passed:</b> the deployed Python scenario engine is ready.':'<b>Attention required:</b> '+passed+' of 4 checks passed. Review the failed checks and API status above.';
+ validationButtonEl.disabled=false;
+ validationButtonEl.textContent='Run all checks';
+}
+validationButtonEl.addEventListener('click',runSystemValidation);
+probeApiHealth();
 
 const dimensions=['Environment','Physiology','Field operations','Product quality','Logistics / process','Economics','Sustainability'];
 const stagesApple=['Planning','Growth','Pre-harvest','Harvest','Packing','Storage','Transport','Retail'];
@@ -683,9 +823,9 @@ function setBaseline(result,label){
 async function evaluateScenarioWithPython(){
  const requestId=++scenarioRequestId;
  try{
-  const response=await fetch('/api/scenarios/evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({crop:globalCrop.value,...state})});
+  const {response,payload}=await fetchJson('/api/scenarios/evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({crop:globalCrop.value,...state})});
   if(!response.ok)throw new Error('Scenario API returned '+response.status);
-  const payload=await response.json();
+  if(!payload)throw new Error('Scenario API returned an empty response');
   if(requestId!==scenarioRequestId)return;
   const result=apiResultToView(payload);
   latestScenarioResult=result;
@@ -693,11 +833,13 @@ async function evaluateScenarioWithPython(){
   renderComparison(result);
   engineStatusEl.textContent='Python engine · '+payload.engineVersion;
   engineStatusEl.className='engine-status ready';
+  setGlobalApiState('connected','Scenario API · '+payload.engineVersion);
   if(typeof renderHomeDynamic==='function')renderHomeDynamic();
  }catch(error){
   if(requestId!==scenarioRequestId)return;
   engineStatusEl.textContent='Browser fallback · Python API unavailable';
   engineStatusEl.className='engine-status fallback';
+  setGlobalApiState('disconnected',error.message);
   console.warn(error);
  }
 }

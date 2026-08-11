@@ -14,7 +14,7 @@ INDEX_FILE = APP_ROOT / "index.html"
 app = FastAPI(
     title="LiDO2 Digital Twin Platform",
     description="Python web service for the LiDO2 multi-stakeholder scenario lab.",
-    version="2.2.0",
+    version="2.3.0",
     docs_url="/api/docs",
     redoc_url=None,
 )

@@ -5,6 +5,8 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import FileResponse
 
+from scenario_engine import ScenarioInput, ScenarioResult, evaluate_scenario
+
 
 APP_ROOT = Path(__file__).resolve().parent
 INDEX_FILE = APP_ROOT / "index.html"
@@ -12,7 +14,7 @@ INDEX_FILE = APP_ROOT / "index.html"
 app = FastAPI(
     title="LiDO2 Digital Twin Platform",
     description="Python web service for the LiDO2 multi-stakeholder scenario lab.",
-    version="2.1.0",
+    version="2.2.0",
     docs_url="/api/docs",
     redoc_url=None,
 )
@@ -57,3 +59,13 @@ async def platform_info() -> dict[str, str]:
         "application": "LiDO2 Multi-Stakeholder Scenario Lab",
         "runtime": "FastAPI",
     }
+
+
+@app.post(
+    "/api/scenarios/evaluate",
+    response_model=ScenarioResult,
+    tags=["Scenarios"],
+)
+async def evaluate(payload: ScenarioInput) -> ScenarioResult:
+    """Validate and evaluate one field-to-market scenario."""
+    return evaluate_scenario(payload)

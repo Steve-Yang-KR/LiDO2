@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>International Digital Twin Platform v2.1 — Multi-Stakeholder Scenario Lab</title>
+<title>International Digital Twin Platform v2.2 — Python Scenario Engine</title>
 <style>
 :root{
   --bg:#edf3ef;--panel:#fff;--ink:#163029;--muted:#687972;--line:#d9e5dd;
@@ -40,6 +40,8 @@ button,input,select{font:inherit}
 .sensor{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--accent2);border:3px solid #fff;box-shadow:0 0 0 3px rgba(46,109,122,.2)}.s1{left:18%;top:48%}.s2{left:50%;top:64%}.s3{right:17%;top:50%}
 .floating{position:absolute;background:#fff;border:1px solid var(--line);padding:7px 9px;border-radius:9px;font-size:11px;font-weight:800;box-shadow:var(--shadow)}.f1{left:6%;top:37%}.f2{right:5%;bottom:8%}
 .results{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:11px}.result{padding:11px;border:1px solid var(--line);background:#f8fbf9;border-radius:12px}.result small{color:var(--muted)}.result b{display:block;font-size:20px;margin-top:2px}
+.engine-row{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}.engine-status{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:850;color:var(--muted)}.engine-status::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--warn)}.engine-status.ready::before{background:var(--ok)}.engine-status.fallback::before{background:var(--danger)}.baseline-button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 10px;font-size:11px;font-weight:850;cursor:pointer}
+.comparison-panel{margin-top:10px;border:1px solid var(--line);border-radius:14px;overflow:hidden}.comparison-head{display:flex;justify-content:space-between;gap:10px;padding:11px 12px;background:#f4f8f5}.comparison-head b{font-size:13px}.comparison-head span{font-size:11px;color:var(--muted)}.comparison-table{width:100%;border-collapse:collapse}.comparison-table th,.comparison-table td{padding:8px 10px;border-top:1px solid var(--line);text-align:right;font-size:11px}.comparison-table th:first-child,.comparison-table td:first-child{text-align:left}.comparison-table th{color:var(--muted);font-weight:800}.delta-positive{color:var(--ok);font-weight:900}.delta-negative{color:var(--danger);font-weight:900}.delta-neutral{color:var(--muted);font-weight:900}
 .lifecycle{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-top:10px}.stage{padding:10px;border:1px solid var(--line);border-radius:11px;background:#f8fbf9;min-height:92px;position:relative}.stage b{font-size:12px;display:block}.stage small{font-size:10px;color:var(--muted)}.stage .qbar{height:8px;background:#e4ebe7;border-radius:99px;overflow:hidden;position:absolute;left:9px;right:9px;bottom:9px}.stage .qbar span{display:block;height:100%;background:var(--accent);transition:.3s}
 .notice{padding:12px;border-left:4px solid var(--accent);background:var(--soft);border-radius:10px;margin-top:10px}
 .copilot-chips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 10px}
@@ -192,6 +194,17 @@ button,input,select{font:inherit}
             <div class="result"><small>Waste risk</small><b id="rWaste">Low</b></div>
             <div class="result"><small>Gross value index</small><b id="rValue">94</b></div>
             <div class="result"><small>Confidence</small><b id="rConfidence">0.78</b></div>
+          </div>
+          <div class="engine-row">
+            <span class="engine-status" id="engineStatus">Connecting to Python scenario engine…</span>
+            <button class="baseline-button" id="setBaselineBtn">Set current as baseline</button>
+          </div>
+          <div class="comparison-panel">
+            <div class="comparison-head"><b>Baseline vs current scenario</b><span id="baselineMeta">Baseline captured on load</span></div>
+            <table class="comparison-table">
+              <thead><tr><th>KPI</th><th>Baseline</th><th>Current</th><th>Δ</th></tr></thead>
+              <tbody id="comparisonBody"></tbody>
+            </table>
           </div>
           <div class="notice"><b id="stakeholderName">Grower recommendation:</b> <span id="recommendation">Maintain irrigation and monitor maturity.</span></div>
         </div>
@@ -616,8 +629,17 @@ function calc(){
  const conf=Math.max(.42,Math.min(.94,.82-(state.disease+state.stress)*.0015-Math.abs(state.temperature)*.006));
  return {quality,yieldIdx,waterEff,waste,value,conf}
 }
-function updateScenario(){
- const x=calc();rQuality.textContent=Math.round(x.quality);rYield.textContent=Math.round(x.yieldIdx);rWater.textContent=Math.round(x.waterEff)+'%';rWaste.textContent=x.waste<18?'Low':x.waste<35?'Medium':'High';rValue.textContent=Math.round(x.value);rConfidence.textContent=x.conf.toFixed(2);
+const engineStatusEl=document.getElementById('engineStatus');
+const setBaselineBtnEl=document.getElementById('setBaselineBtn');
+const comparisonBodyEl=document.getElementById('comparisonBody');
+const baselineMetaEl=document.getElementById('baselineMeta');
+let latestScenarioResult=null;
+let baselineResult=null;
+let scenarioRequestTimer=null;
+let scenarioRequestId=0;
+
+function applyScenarioResult(x){
+ rQuality.textContent=Math.round(x.quality);rYield.textContent=Math.round(x.yieldIdx);rWater.textContent=Math.round(x.waterEff)+'%';rWaste.textContent=x.waste<18?'Low':x.waste<35?'Medium':'High';rValue.textContent=Math.round(x.value);rConfidence.textContent=x.conf.toFixed(2);
  const risk=x.waste<18?'Low':x.waste<35?'Medium':'High';riskLabel.textContent='Stress / loss risk: '+risk;scenarioStatus.textContent=risk==='Low'?'Controlled scenario':risk==='Medium'?'Attention needed':'High-risk scenario';
  sun.style.transform=`scale(${1+Math.max(0,state.temperature)/20})`;document.querySelectorAll('.row').forEach(r=>{r.style.opacity=Math.max(.45,1-state.stress/160);r.style.filter=`saturate(${Math.max(.45,1-state.disease/140)})`});
  fieldLabel.textContent=(globalCrop.value==='apple'?'Block A3':'Parcel V2')+' · maturity '+Math.round(state.maturity)+'%';sceneTitle.textContent=globalCrop.value==='apple'?'Apple Digital Twin':'Vineyard Digital Twin';
@@ -626,6 +648,71 @@ function updateScenario(){
  renderLifecycle(x);
  buildMatrix();
 }
+
+function apiResultToView(result){
+ return {quality:result.quality,yieldIdx:result.yieldIndex,waterEff:result.waterEfficiency,waste:result.wasteScore,value:result.valueIndex,conf:result.confidence,drivers:result.dominantDrivers||[]};
+}
+function comparisonValue(metric,value){
+ if(metric.key==='conf')return value.toFixed(2);
+ if(metric.key==='waterEff')return Math.round(value)+'%';
+ return Math.round(value);
+}
+function renderComparison(current){
+ if(!baselineResult||!current)return;
+ const metrics=[
+  {key:'quality',label:'Quality',lower:false},
+  {key:'yieldIdx',label:'Yield',lower:false},
+  {key:'waterEff',label:'Water efficiency',lower:false},
+  {key:'waste',label:'Waste score',lower:true},
+  {key:'value',label:'Value',lower:false},
+  {key:'conf',label:'Confidence',lower:false}
+ ];
+ comparisonBodyEl.innerHTML=metrics.map(function(metric){
+  const delta=current[metric.key]-baselineResult[metric.key];
+  const impact=delta*(metric.lower?-1:1);
+  const cls=Math.abs(delta)<0.005?'delta-neutral':impact>0?'delta-positive':'delta-negative';
+  const formatted=metric.key==='conf'?delta.toFixed(2):(delta>=0?'+':'')+Math.round(delta);
+  return '<tr><td>'+metric.label+'</td><td>'+comparisonValue(metric,baselineResult[metric.key])+'</td><td>'+comparisonValue(metric,current[metric.key])+'</td><td class="'+cls+'">'+formatted+'</td></tr>';
+ }).join('');
+}
+function setBaseline(result,label){
+ baselineResult={...result};
+ baselineMetaEl.textContent=label||'Baseline updated';
+ renderComparison(latestScenarioResult||result);
+}
+async function evaluateScenarioWithPython(){
+ const requestId=++scenarioRequestId;
+ try{
+  const response=await fetch('/api/scenarios/evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({crop:globalCrop.value,...state})});
+  if(!response.ok)throw new Error('Scenario API returned '+response.status);
+  const payload=await response.json();
+  if(requestId!==scenarioRequestId)return;
+  const result=apiResultToView(payload);
+  latestScenarioResult=result;
+  applyScenarioResult(result);
+  renderComparison(result);
+  engineStatusEl.textContent='Python engine · '+payload.engineVersion;
+  engineStatusEl.className='engine-status ready';
+  if(typeof renderHomeDynamic==='function')renderHomeDynamic();
+ }catch(error){
+  if(requestId!==scenarioRequestId)return;
+  engineStatusEl.textContent='Browser fallback · Python API unavailable';
+  engineStatusEl.className='engine-status fallback';
+  console.warn(error);
+ }
+}
+function updateScenario(){
+ const fallback=calc();
+ latestScenarioResult=fallback;
+ applyScenarioResult(fallback);
+ if(!baselineResult)setBaseline(fallback,'Baseline captured on load');
+ else renderComparison(fallback);
+ engineStatusEl.textContent='Python engine · calculating…';
+ engineStatusEl.className='engine-status';
+ clearTimeout(scenarioRequestTimer);
+ scenarioRequestTimer=setTimeout(evaluateScenarioWithPython,120);
+}
+setBaselineBtnEl.addEventListener('click',function(){setBaseline(latestScenarioResult||calc(),'Baseline updated from current scenario')});
 function recommendationFor(role,x){
  if(role==='grower')return x.waste>35?'Reduce harvest and cooling delays; prioritize the highest-risk block.':x.waterEff<70?'Adjust irrigation using soil moisture and VPD before the next cycle.':'Maintain current management and monitor maturity and stress.';
  if(role==='researcher')return x.conf<.65?'Collect additional physiology measurements before validating the recommendation.':'Test the two strongest model drivers with a controlled block comparison.';
@@ -701,7 +788,7 @@ document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click'
 resetBtn.addEventListener('click',()=>{groups.forEach(g=>g.items.forEach(i=>state[i[0]]=i[5]));renderControls();updateScenario()});
 globalCrop.addEventListener('change',()=>{buildMatrix();updateScenario()});globalRole.addEventListener('change',()=>{renderPersonas();updateScenario()});
 
-chatSend.addEventListener('click',()=>{const q=chatInput.value.trim();if(!q)return;const u=document.createElement('div');u.className='msg user';u.textContent=q;chat.appendChild(u);chatInput.value='';const x=calc();setTimeout(()=>{const a=document.createElement('div');a.className='msg ai';a.innerHTML=`<b>${copilotObjective.value} · ${copilotStyle.value}</b><br>${answerQuery(q,globalRole.value,x)}<br><small>Risk tolerance: ${copilotRisk.value}.</small>`;chat.appendChild(a);chat.scrollTop=chat.scrollHeight},220)});
+chatSend.addEventListener('click',()=>{const q=chatInput.value.trim();if(!q)return;const u=document.createElement('div');u.className='msg user';u.textContent=q;chat.appendChild(u);chatInput.value='';const x=latestScenarioResult||calc();setTimeout(()=>{const a=document.createElement('div');a.className='msg ai';a.innerHTML=`<b>${copilotObjective.value} · ${copilotStyle.value}</b><br>${answerQuery(q,globalRole.value,x)}<br><small>Risk tolerance: ${copilotRisk.value}.</small>`;chat.appendChild(a);chat.scrollTop=chat.scrollHeight},220)});
 chatInput.addEventListener('keydown',e=>{if(e.key==='Enter')chatSend.click()});
 
 // v2.2 dynamic home
@@ -770,7 +857,7 @@ document.querySelectorAll('[data-feature-view]').forEach(b=>b.addEventListener('
 document.querySelectorAll('[data-home-action]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.homeAction)));
 
 function renderHomeDynamic(){
- const x=calc(),crop=globalCrop.value,role=globalRole.value;
+ const x=latestScenarioResult||calc(),crop=globalCrop.value,role=globalRole.value;
  orbitCrop.textContent=crop.toUpperCase();
  orbitStatus.textContent=x.waste<18?'Controlled':x.waste<35?'Attention':'High risk';
  homeFieldLabel.textContent=(crop==='apple'?'Block A3':'Parcel V2')+' · maturity '+Math.round(state.maturity)+'%';
@@ -785,7 +872,7 @@ function renderHomeDynamic(){
  ].map(v=>`<div class="signal-chip"><small>${v[0]}</small><b>${v[1]}</b></div>`).join('');
 }
 function runHomeQuestion(q){
- const x=calc(),role=globalRole.value;
+ const x=latestScenarioResult||calc(),role=globalRole.value;
  const ans=answerQuery(q,role,x);
  homeAnswer.innerHTML='<b>'+homeRoleContent[role].title+':</b><br>'+ans;
 }

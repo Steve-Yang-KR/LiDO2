@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>International Digital Twin Platform v2.3 — System Validation</title>
+<title>International Digital Twin Platform v2.4 — Open Data Twin</title>
 <style>
 :root{
   --bg:#edf3ef;--panel:#fff;--ink:#163029;--muted:#687972;--line:#d9e5dd;
@@ -56,8 +56,9 @@ button,input,select{font:inherit}
 .api-health{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:11px;font-weight:900}.api-health::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--warn)}.api-health.connected{color:#175d42;background:var(--soft)}.api-health.connected::before{background:var(--ok)}.api-health.disconnected{color:var(--danger);background:#fff3f1}.api-health.disconnected::before{background:var(--danger)}
 .validation-hero{display:flex;justify-content:space-between;gap:18px;align-items:center;background:linear-gradient(135deg,#174c3d,#1f7a57 60%,#34737c);color:#fff;border-radius:22px;padding:22px}.validation-hero h3{font-size:27px;margin:6px 0}.validation-hero p{margin:0;opacity:.84;max-width:720px;line-height:1.5}.validation-actions{display:flex;gap:8px;flex-wrap:wrap}.validation-actions button,.validation-actions a{border:0;border-radius:11px;padding:10px 14px;background:#fff;color:var(--ink);font-weight:900;cursor:pointer;text-decoration:none;white-space:nowrap}.validation-actions a{background:rgba(255,255,255,.13);color:#fff;border:1px solid rgba(255,255,255,.25)}
 .validation-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:13px}.validation-summary .metric b{font-size:20px}.validation-list{display:grid;gap:9px;margin-top:13px}.validation-test{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:14px;background:#fff}.validation-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#f1f5f2;font-weight:900;color:var(--muted)}.validation-test.running .validation-icon{background:#fff6e7;color:var(--warn)}.validation-test.pass .validation-icon{background:var(--soft);color:var(--ok)}.validation-test.fail .validation-icon{background:#fff0ee;color:var(--danger)}.validation-test b,.validation-test small{display:block}.validation-test small{color:var(--muted);margin-top:3px;line-height:1.4}.validation-state{font-size:11px;font-weight:900;text-transform:uppercase;color:var(--muted)}.validation-test.pass .validation-state{color:var(--ok)}.validation-test.fail .validation-state{color:var(--danger)}
+.data-source-banner{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;background:linear-gradient(135deg,#173f52,#216f73);color:#fff;border-radius:22px;padding:21px}.data-source-banner h3{font-size:27px;margin:6px 0}.data-source-banner p{margin:0;opacity:.84;line-height:1.5}.source-meta{display:grid;gap:7px}.source-meta div{padding:9px 11px;border:1px solid rgba(255,255,255,.18);border-radius:11px;background:rgba(255,255,255,.08)}.source-meta small,.source-meta b{display:block}.source-meta small{opacity:.7;font-size:10px}.source-meta b{font-size:12px;margin-top:2px}.open-data-tools{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.open-data-tools label{font-size:11px;font-weight:850;color:var(--muted)}.open-data-tools input{display:block;margin-top:4px;padding:8px 9px;border:1px solid var(--line);border-radius:9px}.data-status{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:900;color:var(--muted)}.data-status::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--warn)}.data-status.ready{color:var(--ok)}.data-status.ready::before{background:var(--ok)}.data-status.error{color:var(--danger)}.data-status.error::before{background:var(--danger)}.open-chart{width:100%;height:190px;border:1px solid var(--line);border-radius:13px;background:#fbfdfc}.chart-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:7px;font-size:11px;color:var(--muted)}.chart-legend span::before{content:'';display:inline-block;width:12px;height:3px;border-radius:2px;background:var(--accent);margin-right:5px;vertical-align:middle}.chart-legend span.alt::before{background:var(--accent2)}
 @media(max-width:1100px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:relative}.nav{grid-template-columns:repeat(4,1fr)}.hero,.g2,.g3,.g4,.scenario-layout{grid-template-columns:1fr}.persona-panel{grid-template-columns:1fr 1fr}.results{grid-template-columns:repeat(3,1fr)}.lifecycle{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:680px){.main{padding:11px}.nav{grid-template-columns:1fr 1fr}.topbar{align-items:flex-start;flex-direction:column}.hero h2{font-size:29px}.persona-panel,.results,.lifecycle,.validation-summary{grid-template-columns:1fr}.validation-hero{align-items:flex-start;flex-direction:column}.validation-test{grid-template-columns:42px 1fr}.validation-state{grid-column:2}}
+@media(max-width:680px){.main{padding:11px}.nav{grid-template-columns:1fr 1fr}.topbar{align-items:flex-start;flex-direction:column}.hero h2{font-size:29px}.persona-panel,.results,.lifecycle,.validation-summary,.data-source-banner{grid-template-columns:1fr}.validation-hero{align-items:flex-start;flex-direction:column}.validation-test{grid-template-columns:42px 1fr}.validation-state{grid-column:2}}
 
 /* v2.2 dynamic home */
 .home-command{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;background:linear-gradient(135deg,#174c3d,#1f7a57 58%,#34737c);color:#fff;border-radius:22px;padding:22px;overflow:hidden}
@@ -94,6 +95,7 @@ button,input,select{font:inherit}
     <button data-view="research">🔬 Research</button>
     <button data-view="copilot">🤖 AI Copilot</button>
     <button data-view="stakeholders">👥 Stakeholders</button>
+    <button data-view="opendata">🌦 Open Data Twin</button>
     <button data-view="validation">✅ System Validation</button>
     <button data-view="platform">⚙ Architecture</button>
   </nav>
@@ -535,6 +537,52 @@ button,input,select{font:inherit}
   })();
   </script>
 
+  <section id="opendata" class="view">
+    <div class="data-source-banner">
+      <div>
+        <span class="badge">Location-based environmental proxy</span>
+        <h3>LiDO Open Data Twin</h3>
+        <p>Hourly environmental conditions for the LiDO field-lab area, supplied by Open-Meteo from ERA5-Land reanalysis. These are model estimates, not measurements from LiDO sensors.</p>
+      </div>
+      <div class="source-meta">
+        <div><small>Data source</small><b id="openSource">Open-Meteo / ERA5-Land</b></div>
+        <div><small>Data type</small><b id="openType">Reanalysis / model estimate</b></div>
+        <div><small>Validation status</small><b id="openValidation">Proxy data — not validated against LiDO sensors</b></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:13px">
+      <div class="section-head">
+        <div><h3>Environmental data window</h3><p class="muted">Up to 31 days · five-day reanalysis availability lag</p></div>
+        <span class="data-status" id="openDataStatus">Not loaded</span>
+      </div>
+      <div class="open-data-tools" style="margin-top:10px">
+        <label>Start date<input type="date" id="openStart"></label>
+        <label>End date<input type="date" id="openEnd"></label>
+        <button class="primary" id="loadOpenData">Load open data</button>
+        <button class="baseline-button" id="applyOpenData" disabled>Apply to Scenario Lab</button>
+      </div>
+      <p class="muted" id="openDataMeta" style="font-size:11px;margin-bottom:0">Location: LiDO field-lab area · waiting for data</p>
+    </div>
+
+    <div class="grid g4" style="margin-top:13px">
+      <div class="metric"><small>Mean temperature</small><b id="odTemperature">—</b><em>2 m air temperature</em></div>
+      <div class="metric"><small>Total precipitation</small><b id="odRain">—</b><em>Selected period</em></div>
+      <div class="metric"><small>Soil moisture</small><b id="odSoil">—</b><em>0–7 cm model layer</em></div>
+      <div class="metric"><small>Mean VPD</small><b id="odVpd">—</b><em>Derived from temperature + RH</em></div>
+      <div class="metric"><small>ET₀</small><b id="odEt0">—</b><em>FAO reference evapotranspiration</em></div>
+      <div class="metric"><small>Growing degree days</small><b id="odGdd">—</b><em>Base temperature 10 °C</em></div>
+      <div class="metric"><small>Water stress index</small><b id="odStress">—</b><em>Transparent proxy · 0–100</em></div>
+      <div class="metric"><small>Mean solar radiation</small><b id="odSolar">—</b><em>Hourly W/m²</em></div>
+    </div>
+
+    <div class="grid g2" style="margin-top:13px">
+      <div class="card"><h3>Air temperature and VPD</h3><svg id="climateChart" class="open-chart" viewBox="0 0 700 190" preserveAspectRatio="none" aria-label="Temperature and VPD time series"></svg><div class="chart-legend"><span>Temperature</span><span class="alt">VPD</span></div></div>
+      <div class="card"><h3>Soil moisture and precipitation</h3><svg id="waterChart" class="open-chart" viewBox="0 0 700 190" preserveAspectRatio="none" aria-label="Soil moisture and precipitation time series"></svg><div class="chart-legend"><span>Soil moisture</span><span class="alt">Precipitation</span></div></div>
+    </div>
+    <div class="notice"><b>Interpretation rule:</b> open-data values are suitable for prototype integration, regional context and model demonstrations. Field decisions require validation against calibrated on-site LiDO sensors.</div>
+  </section>
+
   <section id="platform" class="view">
     <div class="grid g3"><div class="card"><h3>Experience layer</h3><p class="muted">Role workspaces, scenario controls, dynamic twins, AI Copilot.</p></div><div class="card"><h3>Intelligence layer</h3><p class="muted">Crop models, quality propagation, recommendations, uncertainty.</p></div><div class="card"><h3>Research layer</h3><p class="muted">Hypotheses, experiments, validation, knowledge reuse.</p></div></div>
 
@@ -593,7 +641,7 @@ button,input,select{font:inherit}
 
 <script>
 const nav=document.querySelectorAll('.nav button'),views=document.querySelectorAll('.view');
-const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],validation:['System Validation','Verify the deployed Python API with live browser-based checks.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
+const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],opendata:['LiDO Open Data Twin','Explore location-based ERA5-Land proxy data and apply it to a scenario.'],validation:['System Validation','Verify the deployed Python API with live browser-based checks.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
 nav.forEach(b=>b.addEventListener('click',()=>{nav.forEach(x=>x.classList.remove('active'));views.forEach(x=>x.classList.remove('active'));b.classList.add('active');const id=b.dataset.view;document.getElementById(id).classList.add('active');pageTitle.textContent=titles[id][0];pageSub.textContent=titles[id][1];window.scrollTo({top:0,left:0,behavior:'auto'});document.querySelector('.main').scrollTop=0}));
 
 const globalApiHealthEl=document.getElementById('globalApiHealth');
@@ -701,6 +749,60 @@ async function runSystemValidation(){
 }
 validationButtonEl.addEventListener('click',runSystemValidation);
 probeApiHealth();
+
+let latestOpenData=null;
+const openDataStatusEl=document.getElementById('openDataStatus');
+const openStartEl=document.getElementById('openStart');
+const openEndEl=document.getElementById('openEnd');
+const loadOpenDataEl=document.getElementById('loadOpenData');
+const applyOpenDataEl=document.getElementById('applyOpenData');
+function isoDateOffset(days){const d=new Date();d.setUTCDate(d.getUTCDate()+days);return d.toISOString().slice(0,10)}
+openEndEl.value=isoDateOffset(-5);openStartEl.value=isoDateOffset(-11);
+function safeNumber(value,fallback=0){return Number.isFinite(Number(value))?Number(value):fallback}
+function chartPolyline(rows,key,width=700,height=190){
+ const values=rows.map(row=>safeNumber(row[key],NaN)).filter(Number.isFinite);
+ if(!values.length)return '';
+ const min=Math.min(...values),max=Math.max(...values),span=max-min||1;
+ return rows.map((row,index)=>{const value=safeNumber(row[key],min);const x=14+(index/Math.max(1,rows.length-1))*(width-28);const y=height-16-((value-min)/span)*(height-32);return x.toFixed(1)+','+y.toFixed(1)}).join(' ');
+}
+function renderOpenChart(id,rows,primary,secondary){
+ const svg=document.getElementById(id);const grid=[38,76,114,152].map(y=>'<line x1="0" y1="'+y+'" x2="700" y2="'+y+'" stroke="#e4ece7"/>').join('');
+ svg.innerHTML=grid+'<polyline points="'+chartPolyline(rows,primary)+'" fill="none" stroke="#1c7a55" stroke-width="3" vector-effect="non-scaling-stroke"/><polyline points="'+chartPolyline(rows,secondary)+'" fill="none" stroke="#2e6d7a" stroke-width="2.5" vector-effect="non-scaling-stroke"/>';
+}
+function renderOpenData(payload){
+ const s=payload.summary,rows=payload.series||[];
+ openSource.textContent=payload.source;openType.textContent=payload.dataType;openValidation.textContent=payload.validationStatus;
+ odTemperature.textContent=safeNumber(s.temperature).toFixed(1)+' °C';odRain.textContent=safeNumber(s.precipitation).toFixed(1)+' mm';odSoil.textContent=safeNumber(s.soilMoisture).toFixed(1)+'%';odVpd.textContent=safeNumber(s.vpd).toFixed(2)+' kPa';odEt0.textContent=safeNumber(s.et0).toFixed(1)+' mm';odGdd.textContent=safeNumber(s.growingDegreeDays).toFixed(1);odStress.textContent=safeNumber(s.waterStressIndex).toFixed(0)+'/100';odSolar.textContent=safeNumber(s.solarRadiation).toFixed(0)+' W/m²';
+ openDataMeta.textContent=payload.location.name+' · '+payload.period.start+' to '+payload.period.end+' · retrieved '+payload.retrievedAt+' · cache '+payload.cacheStatus;
+ renderOpenChart('climateChart',rows,'temperature','vpd');renderOpenChart('waterChart',rows,'soilMoisture','precipitation');
+}
+async function loadOpenData(){
+ loadOpenDataEl.disabled=true;openDataStatusEl.className='data-status';openDataStatusEl.textContent='Loading ERA5-Land…';
+ try{
+  const params=new URLSearchParams({start_date:openStartEl.value,end_date:openEndEl.value});
+  const {response,payload}=await fetchJson('/api/open-data/environment?'+params.toString(),{headers:{Accept:'application/json'}});
+  if(!response.ok||!payload)throw new Error(payload&&payload.detail?payload.detail:'Open-data API returned HTTP '+response.status);
+  latestOpenData=payload;renderOpenData(payload);applyOpenDataEl.disabled=false;openDataStatusEl.className='data-status ready';openDataStatusEl.textContent='Connected · '+payload.model;
+ }catch(error){openDataStatusEl.className='data-status error';openDataStatusEl.textContent='Unavailable · '+error.message;applyOpenDataEl.disabled=true}
+ finally{loadOpenDataEl.disabled=false}
+}
+function applyOpenValue(key,value,unit){
+ state[key]=value;const input=document.getElementById(key),output=document.getElementById(key+'Out');if(input)input.value=value;if(output)output.textContent=value+' '+unit;
+}
+loadOpenDataEl.addEventListener('click',loadOpenData);
+applyOpenDataEl.addEventListener('click',()=>{
+ if(!latestOpenData)return;const s=latestOpenData.summary,clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
+ applyOpenValue('temperature',+clamp(s.temperature-18,-5,10).toFixed(1),'°C');
+ applyOpenValue('rain',Math.round(clamp(s.precipitation,0,100)),'mm');
+ applyOpenValue('humidity',Math.round(clamp(s.humidity,30,100)),'%');
+ applyOpenValue('vpd',+clamp(s.vpd,0,4).toFixed(1),'kPa');
+ applyOpenValue('solar',Math.round(clamp((s.solarRadiation/180)*100,40,130)),'%');
+ applyOpenValue('wind',+clamp(s.windSpeed,0,15).toFixed(1),'m/s');
+ applyOpenValue('soil',Math.round(clamp(s.soilMoisture,10,50)),'%');
+ applyOpenValue('stress',Math.round(clamp(s.waterStressIndex,0,100)),'%');
+ updateScenario();switchView('scenario');engineStatusEl.title='Environmental inputs applied from Open-Meteo / ERA5-Land proxy data, not LiDO sensors';
+});
+setTimeout(loadOpenData,250);
 
 const dimensions=['Environment','Physiology','Field operations','Product quality','Logistics / process','Economics','Sustainability'];
 const stagesApple=['Planning','Growth','Pre-harvest','Harvest','Packing','Storage','Transport','Retail'];

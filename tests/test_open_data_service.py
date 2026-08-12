@@ -1,0 +1,50 @@
+import unittest
+from datetime import date
+
+from open_data_service import calculate_vpd, get_environmental_data
+
+
+def fixture_payload():
+    return {
+        "timezone": "Europe/Rome",
+        "hourly": {
+            "time": ["2026-07-01T12:00", "2026-07-01T13:00"],
+            "temperature_2m": [20.0, 22.0],
+            "relative_humidity_2m": [60.0, 50.0],
+            "precipitation": [1.0, 2.0],
+            "shortwave_radiation": [400.0, 500.0],
+            "soil_temperature_0_to_7cm": [18.0, 19.0],
+            "soil_moisture_0_to_7cm": [0.22, 0.24],
+            "et0_fao_evapotranspiration": [0.2, 0.3],
+            "wind_speed_10m": [4.0, 6.0],
+        },
+    }
+
+
+class OpenDataServiceTests(unittest.TestCase):
+    def test_vpd_is_calculated_from_temperature_and_humidity(self):
+        self.assertAlmostEqual(calculate_vpd(20, 60), 0.935, places=3)
+
+    def test_proxy_payload_is_normalized_and_labelled(self):
+        result = get_environmental_data(
+            start_date=date(2026, 7, 1),
+            end_date=date(2026, 7, 1),
+            fetcher=lambda _: fixture_payload(),
+        )
+        self.assertEqual(result["source"], "Open-Meteo / ERA5-Land")
+        self.assertIn("not validated", result["validationStatus"])
+        self.assertEqual(result["summary"]["precipitation"], 3.0)
+        self.assertEqual(result["summary"]["soilMoisture"], 23.0)
+        self.assertEqual(len(result["series"]), 2)
+
+    def test_date_range_over_31_days_is_rejected(self):
+        with self.assertRaises(ValueError):
+            get_environmental_data(
+                start_date=date(2026, 6, 1),
+                end_date=date(2026, 7, 2),
+                fetcher=lambda _: fixture_payload(),
+            )
+
+
+if __name__ == "__main__":
+    unittest.main()

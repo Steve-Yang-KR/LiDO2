@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
@@ -42,6 +43,22 @@ class ApiValidationTests(unittest.TestCase):
             json={"temperature": 30},
         )
 
+        self.assertEqual(response.status_code, 422)
+
+    @patch("app.get_environmental_data")
+    def test_open_data_endpoint_exposes_proxy_labels(self, mocked) -> None:
+        mocked.return_value = {
+            "source": "Open-Meteo / ERA5-Land",
+            "dataType": "Reanalysis / model estimate",
+            "validationStatus": "Proxy data — not validated against LiDO sensors",
+            "series": [],
+        }
+        response = self.client.get("/api/open-data/environment?days=7")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["dataType"], "Reanalysis / model estimate")
+
+    def test_open_data_date_range_requires_both_dates(self) -> None:
+        response = self.client.get("/api/open-data/environment?start_date=2026-07-01")
         self.assertEqual(response.status_code, 422)
 
 

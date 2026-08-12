@@ -31,4 +31,4 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
-      - run: python -m unittest tests.test_api -v
+      - run: python -m unittest tests.test_api tests.test_open_data_service -v

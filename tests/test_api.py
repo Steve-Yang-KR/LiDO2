@@ -18,6 +18,13 @@ class ApiValidationTests(unittest.TestCase):
         self.assertEqual(response.json()["status"], "ok")
         self.assertTrue(response.json()["index_available"])
 
+    def test_homepage_exposes_pilot_manager(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Experiment & Pilot Manager", response.text)
+        self.assertIn("PILOT_STORAGE_KEY", response.text)
+        self.assertIn("Export JSON", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

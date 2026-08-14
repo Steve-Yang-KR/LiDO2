@@ -103,6 +103,10 @@ button,input,select{font:inherit}
 .field-marker{position:absolute;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;color:white;background:#2e6d7a;border:2px solid white;box-shadow:0 3px 8px #0003}.field-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:10px;margin-top:10px}.field-legend span:before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:#2e6d7a;margin-right:4px}.field-legend span:nth-child(2):before{background:#b77b1d}.field-legend span:nth-child(3):before{background:#7b5db5}
 .asset-list{display:grid;gap:7px;margin-top:9px}.asset{border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px;cursor:pointer}.asset.active{border-color:var(--accent);background:var(--soft)}.asset small{color:var(--muted);display:block;margin-top:3px}
 @media(max-width:900px){.field-layout{grid-template-columns:1fr}.field-map{min-height:390px}}
+.pilot-layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:12px}.pilot-form{display:grid;gap:8px}.pilot-form label{display:grid;gap:4px;font-size:11px;font-weight:800}.pilot-form input,.pilot-form select,.pilot-form textarea{border:1px solid var(--line);border-radius:9px;padding:8px;background:#fff}.pilot-form textarea{min-height:66px;resize:vertical}
+.pilot-board{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:8px;overflow:auto}.pilot-column{background:#eef4f0;border:1px solid var(--line);border-radius:13px;padding:8px;min-height:360px}.pilot-column h4{margin:2px 2px 8px;font-size:12px}.pilot-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px;margin-bottom:7px;cursor:pointer}.pilot-card:hover{border-color:var(--accent)}.pilot-card small{display:block;color:var(--muted);margin-top:4px}.pilot-card .pilot-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.pilot-card .pilot-tags span{font-size:9px;padding:3px 5px;border-radius:999px;background:var(--soft)}
+.pilot-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.pilot-storage{font-size:10px;color:var(--muted);margin-top:8px}
+@media(max-width:900px){.pilot-layout{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -115,6 +119,7 @@ button,input,select{font:inherit}
     <button data-view="quality">📦 Value Chain</button>
     <button data-view="matrix">🧭 Twin Matrix</button>
     <button data-view="research">🔬 Research</button>
+    <button data-view="pilots">🧪 Pilot Manager</button>
     <button data-view="copilot">🤖 AI Copilot</button>
     <button data-view="stakeholders">👥 Stakeholders</button>
     <button data-view="opendata">🌦 Open Data Twin</button>
@@ -695,6 +700,29 @@ button,input,select{font:inherit}
     </div>
   </section>
 
+  <section id="pilots" class="view">
+    <div class="data-source-banner">
+      <div><span class="badge">Browser-local pilot workspace</span><h3>Experiment & Pilot Manager</h3><p>Define hypotheses, partners, KPIs, periods and delivery stages before official LiDO integration becomes available.</p></div>
+      <div class="source-meta"><div><small>Active pilots</small><b id="pilotActiveCount">0</b></div><div><small>Data storage</small><b>Local browser</b></div><div><small>LiDO approval</small><b>Not connected</b></div></div>
+    </div>
+    <div class="pilot-layout" style="margin-top:13px">
+      <div class="card"><h3>Create pilot</h3>
+        <form class="pilot-form" id="pilotForm">
+          <label>Pilot title<input id="pilotTitle" required placeholder="e.g. Irrigation scheduling baseline"></label>
+          <label>Partner / organisation<input id="pilotPartner" required placeholder="Research or technology partner"></label>
+          <div class="grid g2"><label>Crop<select id="pilotCrop"><option>Apple</option><option>Vineyard</option><option>Cross-crop</option></select></label><label>Stage<select id="pilotStage"><option>Concept</option><option>Design</option><option>Field Trial</option><option>Review</option></select></label></div>
+          <div class="grid g2"><label>Start<input type="date" id="pilotStart" required></label><label>End<input type="date" id="pilotEnd" required></label></div>
+          <label>Hypothesis<textarea id="pilotHypothesis" required placeholder="What should the pilot prove?"></textarea></label>
+          <label>Primary KPI<input id="pilotKpi" required placeholder="e.g. Water use reduction (%)"></label>
+          <button class="primary" type="submit">Add pilot</button>
+        </form>
+        <p class="pilot-storage">Prototype records are stored in this browser only. They are not submitted to LiDO or Render.</p>
+      </div>
+      <div class="card"><div class="section-head"><div><h3>Pilot portfolio</h3><p class="muted">Concept → Design → Field Trial → Review</p></div><button class="baseline-button" id="exportPilots">Export JSON</button></div><div class="pilot-board" id="pilotBoard"></div></div>
+    </div>
+    <div class="card" style="margin-top:13px"><div class="section-head"><div><h3 id="pilotDetailTitle">Select a pilot</h3><p class="muted" id="pilotDetailMeta">Inspect its hypothesis, KPI and progress.</p></div><span class="data-status" id="pilotDetailStatus">No selection</span></div><p id="pilotDetailHypothesis" class="muted">—</p><div class="pilot-actions"><button class="primary" id="advancePilot" disabled>Advance stage</button><button class="baseline-button" id="deletePilot" disabled>Delete pilot</button></div></div>
+  </section>
+
   <section id="validation" class="view">
     <div class="validation-hero">
       <div>
@@ -733,7 +761,7 @@ button,input,select{font:inherit}
 
 <script>
 const nav=document.querySelectorAll('.nav button'),views=document.querySelectorAll('.view');
-const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],opendata:['LiDO Open Data Twin','Explore location-based ERA5-Land proxy data and apply it to a scenario.'],fieldtwin:['Spatial Field Twin','Explore conceptual apple-orchard and vineyard geometry, rows, and device positions.'],comparison:['Open Data vs Sensor Comparison','Evaluate uploaded or labelled demo observations against the ERA5-Land baseline.'],validation:['System Validation','Verify the deployed Python API with live browser-based checks.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
+const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],pilots:['Experiment & Pilot Manager','Define pilot hypotheses, partners, KPIs, periods and delivery stages.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],opendata:['LiDO Open Data Twin','Explore location-based ERA5-Land proxy data and apply it to a scenario.'],fieldtwin:['Spatial Field Twin','Explore conceptual apple-orchard and vineyard geometry, rows, and device positions.'],comparison:['Open Data vs Sensor Comparison','Evaluate uploaded or labelled demo observations against the ERA5-Land baseline.'],validation:['System Validation','Verify the deployed Python API with live browser-based checks.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
 nav.forEach(b=>b.addEventListener('click',()=>{nav.forEach(x=>x.classList.remove('active'));views.forEach(x=>x.classList.remove('active'));b.classList.add('active');const id=b.dataset.view;document.getElementById(id).classList.add('active');pageTitle.textContent=titles[id][0];pageSub.textContent=titles[id][1];window.scrollTo({top:0,left:0,behavior:'auto'});document.querySelector('.main').scrollTop=0}));
 
 const globalApiHealthEl=document.getElementById('globalApiHealth');
@@ -952,6 +980,21 @@ function renderSpatialField(type){
  fieldAssetCount.textContent=(field.rows+field.assets.length)+' mapped';showAppleField.className=type==='apple'?'primary':'baseline-button';showVineyardField.className=type==='vineyard'?'primary':'baseline-button';
 }
 showAppleField.addEventListener('click',()=>renderSpatialField('apple'));showVineyardField.addEventListener('click',()=>renderSpatialField('vineyard'));renderSpatialField('apple');
+
+const PILOT_STORAGE_KEY='lido2-pilots-v1',pilotStages=['Concept','Design','Field Trial','Review'];let selectedPilotId=null;
+const defaultPilots=[{id:'demo-baseline',title:'Open-data irrigation baseline',partner:'Internal demo',crop:'Apple',stage:'Concept',start:'2026-09-01',end:'2026-10-15',hypothesis:'ERA5-Land indicators can provide a transparent pre-integration baseline for irrigation planning.',kpi:'Baseline completeness (%)',source:'Demo'}];
+function loadPilots(){try{return JSON.parse(localStorage.getItem(PILOT_STORAGE_KEY))||defaultPilots}catch(error){return defaultPilots}}
+let pilots=loadPilots();function savePilots(){localStorage.setItem(PILOT_STORAGE_KEY,JSON.stringify(pilots))}
+function renderPilots(){
+ pilotBoard.replaceChildren();pilotStages.forEach(stage=>{const column=document.createElement('div');column.className='pilot-column';const heading=document.createElement('h4');heading.textContent=stage+' · '+pilots.filter(p=>p.stage===stage).length;column.appendChild(heading);pilots.filter(p=>p.stage===stage).forEach(p=>{const card=document.createElement('button');card.type='button';card.className='pilot-card';const title=document.createElement('b');title.textContent=p.title;const meta=document.createElement('small');meta.textContent=p.partner+' · '+p.start+' → '+p.end;const tags=document.createElement('div');tags.className='pilot-tags';[p.crop,p.kpi,p.source||'User'].forEach(value=>{const tag=document.createElement('span');tag.textContent=value;tags.appendChild(tag)});card.append(title,meta,tags);card.addEventListener('click',()=>selectPilot(p.id));column.appendChild(card)});pilotBoard.appendChild(column)});
+ pilotActiveCount.textContent=String(pilots.filter(p=>p.stage!=='Review').length);
+}
+function selectPilot(id){const p=pilots.find(x=>x.id===id);if(!p)return;selectedPilotId=id;pilotDetailTitle.textContent=p.title;pilotDetailMeta.textContent=p.partner+' · '+p.crop+' · '+p.start+' to '+p.end+' · KPI: '+p.kpi;pilotDetailStatus.textContent=p.stage;pilotDetailStatus.className='data-status ready';pilotDetailHypothesis.textContent=p.hypothesis;advancePilot.disabled=p.stage==='Review';deletePilot.disabled=false}
+pilotForm.addEventListener('submit',event=>{event.preventDefault();if(pilotEnd.value<pilotStart.value){pilotDetailStatus.className='data-status error';pilotDetailStatus.textContent='End date must follow start';return}const p={id:'pilot-'+Date.now(),title:pilotTitle.value.trim(),partner:pilotPartner.value.trim(),crop:pilotCrop.value,stage:pilotStage.value,start:pilotStart.value,end:pilotEnd.value,hypothesis:pilotHypothesis.value.trim(),kpi:pilotKpi.value.trim(),source:'User'};pilots.push(p);savePilots();renderPilots();selectPilot(p.id);pilotForm.reset()});
+advancePilot.addEventListener('click',()=>{const p=pilots.find(x=>x.id===selectedPilotId);if(!p)return;const index=pilotStages.indexOf(p.stage);if(index<pilotStages.length-1)p.stage=pilotStages[index+1];savePilots();renderPilots();selectPilot(p.id)});
+deletePilot.addEventListener('click',()=>{if(!selectedPilotId)return;pilots=pilots.filter(p=>p.id!==selectedPilotId);savePilots();selectedPilotId=null;pilotDetailTitle.textContent='Select a pilot';pilotDetailMeta.textContent='Inspect its hypothesis, KPI and progress.';pilotDetailStatus.textContent='No selection';pilotDetailHypothesis.textContent='—';advancePilot.disabled=true;deletePilot.disabled=true;renderPilots()});
+exportPilots.addEventListener('click',()=>{const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),pilots},null,2)],{type:'application/json'}),link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='lido2-pilots.json';link.click();URL.revokeObjectURL(link.href)});
+pilotStart.value=isoDateOffset(18);pilotEnd.value=isoDateOffset(63);renderPilots();
 
 const dimensions=['Environment','Physiology','Field operations','Product quality','Logistics / process','Economics','Sustainability'];
 const stagesApple=['Planning','Growth','Pre-harvest','Harvest','Packing','Storage','Transport','Retail'];

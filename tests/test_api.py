@@ -46,6 +46,22 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("PILOT_STORAGE_KEY", response.text)
         self.assertIn("Export JSON", response.text)
 
+    def test_homepage_exposes_monthly_field_yield_analytics(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Apple & Vineyard Field and Yield Analytics", response.text)
+        self.assertIn("yieldTrend", response.text)
+        self.assertIn("Model forecast", response.text)
+
+    @patch("app.get_environmental_data")
+    def test_open_data_endpoint_accepts_coordinates(self, mocked) -> None:
+        mocked.return_value = {"series": [], "location": {"latitude": 46.4, "longitude": 11.3}}
+        response = self.client.get("/api/open-data/environment?days=7&latitude=46.4&longitude=11.3")
+        self.assertEqual(response.status_code, 200)
+        kwargs = mocked.call_args.kwargs
+        self.assertEqual(kwargs["latitude"], 46.4)
+        self.assertEqual(kwargs["longitude"], 11.3)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

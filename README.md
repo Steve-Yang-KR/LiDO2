@@ -28,7 +28,7 @@ Open `http://127.0.0.1:8000`.
 - `/health` — deployment health check
 - `/api/platform-info` — platform metadata
 - `POST /api/scenarios/evaluate` — validate and evaluate a Scenario Lab state
-- `GET /api/open-data/environment` — retrieve and normalize Open-Meteo/ERA5-Land proxy data for the LiDO field-lab area
+- `GET /api/open-data/environment` — retrieve and normalize Open-Meteo/ERA5-Land proxy data for bounded user-supplied coordinates near the LiDO field-lab area
 - `/api/docs` — interactive FastAPI API documentation
 
 The **System Validation** workspace runs four live checks against the deployed API: the default profile, Heat Wave KPI reduction, frontend camelCase aliases, and rejection of out-of-range inputs. The global API badge also reports whether the Python service is connected or the interface is using its browser fallback.
@@ -36,6 +36,10 @@ The **System Validation** workspace runs four live checks against the deployed A
 The Scenario Lab keeps the interface responsive with an immediate browser preview, then replaces it with the validated Python result. A baseline can be captured at any time to compare quality, yield, water efficiency, waste, value, and confidence.
 
 The **Open Data Twin** uses hourly ERA5-Land reanalysis supplied through Open-Meteo for the LiDO field-lab coordinates. The adapter explicitly requests `models=era5_land`, validates the returned grid coordinates, timezone, hourly columns, and unit metadata, and exposes the result in the API `provenance` object. It visualizes weather, radiation, soil moisture, VPD, ET₀, growing degree days, and a transparent water-stress proxy, and can apply compatible environmental values to Scenario Lab. The interface always identifies these values as `Reanalysis / model estimate` and `Proxy data — not validated against LiDO sensors`; they must not be described as LiDO measurements.
+
+## Monthly field and yield analytics
+
+The Field & Yield Analytics workspace compares separate user-entered apple and vineyard coordinates over a 30-day ERA5-Land window. Environmental charts show model estimates; editable crop-density and fruit/cluster assumptions drive transparent low/base/high yield forecasts. Default coordinates are explicitly labelled as unverified proxies, and all yield results are labelled as model forecasts rather than measured LiDO yields.
 
 ## Run tests
 

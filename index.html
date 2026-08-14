@@ -107,6 +107,9 @@ button,input,select{font:inherit}
 .pilot-board{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:8px;overflow:auto}.pilot-column{background:#eef4f0;border:1px solid var(--line);border-radius:13px;padding:8px;min-height:360px}.pilot-column h4{margin:2px 2px 8px;font-size:12px}.pilot-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px;margin-bottom:7px;cursor:pointer}.pilot-card:hover{border-color:var(--accent)}.pilot-card small{display:block;color:var(--muted);margin-top:4px}.pilot-card .pilot-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.pilot-card .pilot-tags span{font-size:9px;padding:3px 5px;border-radius:999px;background:var(--soft)}
 .pilot-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.pilot-storage{font-size:10px;color:var(--muted);margin-top:8px}
 @media(max-width:900px){.pilot-layout{grid-template-columns:1fr}}
+
+.analytics-controls{display:grid;grid-template-columns:repeat(6,minmax(110px,1fr));gap:7px}.analytics-controls label,.yield-inputs label{display:grid;gap:3px;font-size:10px;font-weight:800}.analytics-controls input,.yield-inputs input{border:1px solid var(--line);border-radius:8px;padding:7px;background:#fff}.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.analytics-chart{width:100%;height:190px;background:linear-gradient(#fbfdfc,#f2f7f4);border:1px solid var(--line);border-radius:11px}.yield-inputs{display:grid;grid-template-columns:repeat(4,minmax(90px,1fr));gap:6px;margin:8px 0}.analytics-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.analytics-kpis div{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px}.analytics-kpis small{display:block;color:var(--muted);font-size:9px}.analytics-kpis b{font-size:14px}.proxy-alert{border-left:3px solid var(--warn);background:#fff8e8;padding:8px 10px;font-size:10px;line-height:1.45;margin-top:8px}
+@media(max-width:1000px){.analytics-controls{grid-template-columns:repeat(3,1fr)}.analytics-grid{grid-template-columns:1fr}}@media(max-width:650px){.analytics-controls,.yield-inputs{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -124,6 +127,7 @@ button,input,select{font:inherit}
     <button data-view="stakeholders">👥 Stakeholders</button>
     <button data-view="opendata">🌦 Open Data Twin</button>
     <button data-view="fieldtwin">🗺 Spatial Field Twin</button>
+    <button data-view="analytics">📈 Field & Yield Analytics</button>
     <button data-view="comparison">📐 Data Comparison</button>
     <button data-view="validation">✅ System Validation</button>
     <button data-view="platform">⚙ Architecture</button>
@@ -723,6 +727,28 @@ button,input,select{font:inherit}
     <div class="card" style="margin-top:13px"><div class="section-head"><div><h3 id="pilotDetailTitle">Select a pilot</h3><p class="muted" id="pilotDetailMeta">Inspect its hypothesis, KPI and progress.</p></div><span class="data-status" id="pilotDetailStatus">No selection</span></div><p id="pilotDetailHypothesis" class="muted">—</p><div class="pilot-actions"><button class="primary" id="advancePilot" disabled>Advance stage</button><button class="baseline-button" id="deletePilot" disabled>Delete pilot</button></div></div>
   </section>
 
+  <section id="analytics" class="view">
+    <div class="data-source-banner">
+      <div><span class="badge">30-day model analytics</span><h3>Apple & Vineyard Field and Yield Analytics</h3><p>Compare one month of ERA5-Land environmental conditions and update transparent yield forecasts for apple and Chardonnay field concepts.</p></div>
+      <div class="source-meta"><div><small>Coordinates</small><b>User-entered / proxy</b></div><div><small>Environment</small><b>ERA5-Land estimate</b></div><div><small>Yield</small><b>Model forecast</b></div></div>
+    </div>
+    <div class="card" style="margin-top:13px">
+      <div class="analytics-controls">
+        <label>Start date<input type="date" id="analyticsStart"></label><label>End date<input type="date" id="analyticsEnd"></label>
+        <label>Apple latitude<input type="number" step="0.0001" id="appleLat" value="46.3827"></label><label>Apple longitude<input type="number" step="0.0001" id="appleLon" value="11.2881"></label>
+        <label>Vineyard latitude<input type="number" step="0.0001" id="vineLat" value="46.3827"></label><label>Vineyard longitude<input type="number" step="0.0001" id="vineLon" value="11.2881"></label>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:9px"><button class="primary" id="loadMonthlyAnalytics">Load 30-day analytics</button><span class="data-status" id="analyticsStatus">Not loaded</span></div>
+      <p class="proxy-alert">Default coordinates are an unverified LiDO-area proxy, not surveyed apple-orchard or vineyard boundaries. Replace them with field GPS points before plot-level interpretation.</p>
+    </div>
+    <div class="analytics-grid" style="margin-top:13px">
+      <div class="card"><div class="section-head"><div><h3>Apple · 30-day environment</h3><p class="muted" id="appleAnalyticsMeta">Waiting for data</p></div></div><svg class="analytics-chart" id="appleEnvChart" viewBox="0 0 700 190" preserveAspectRatio="none"></svg><div class="analytics-kpis" id="appleEnvKpis"></div></div>
+      <div class="card"><div class="section-head"><div><h3>Vineyard · 30-day environment</h3><p class="muted" id="vineAnalyticsMeta">Waiting for data</p></div></div><svg class="analytics-chart" id="vineEnvChart" viewBox="0 0 700 190" preserveAspectRatio="none"></svg><div class="analytics-kpis" id="vineEnvKpis"></div></div>
+      <div class="card"><h3>Apple yield forecast</h3><div class="yield-inputs"><label>Area ha<input id="appleArea" type="number" step=".01" value=".65"></label><label>Trees/ha<input id="appleDensity" type="number" value="1667"></label><label>Fruit/tree<input id="appleFruitCount" type="number" value="80"></label><label>Fruit kg<input id="appleFruitWeight" type="number" step=".01" value=".18"></label></div><svg class="analytics-chart" id="appleYieldChart" viewBox="0 0 700 190" preserveAspectRatio="none"></svg><p class="muted" id="appleYieldMeta">Model forecast—not measured LiDO yield.</p></div>
+      <div class="card"><h3>Vineyard yield forecast</h3><div class="yield-inputs"><label>Area ha<input id="vineArea" type="number" step=".01" value=".40"></label><label>Vines/ha<input id="vineDensity" type="number" value="4000"></label><label>Clusters/vine<input id="vineClusterCount" type="number" value="15"></label><label>Cluster kg<input id="vineClusterWeight" type="number" step=".01" value=".15"></label></div><svg class="analytics-chart" id="vineYieldChart" viewBox="0 0 700 190" preserveAspectRatio="none"></svg><p class="muted" id="vineYieldMeta">Model forecast—not measured LiDO yield.</p></div>
+    </div>
+  </section>
+
   <section id="validation" class="view">
     <div class="validation-hero">
       <div>
@@ -761,7 +787,7 @@ button,input,select{font:inherit}
 
 <script>
 const nav=document.querySelectorAll('.nav button'),views=document.querySelectorAll('.view');
-const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],pilots:['Experiment & Pilot Manager','Define pilot hypotheses, partners, KPIs, periods and delivery stages.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],opendata:['LiDO Open Data Twin','Explore location-based ERA5-Land proxy data and apply it to a scenario.'],fieldtwin:['Spatial Field Twin','Explore conceptual apple-orchard and vineyard geometry, rows, and device positions.'],comparison:['Open Data vs Sensor Comparison','Evaluate uploaded or labelled demo observations against the ERA5-Land baseline.'],validation:['System Validation','Verify the deployed Python API with live browser-based checks.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
+const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],pilots:['Experiment & Pilot Manager','Define pilot hypotheses, partners, KPIs, periods and delivery stages.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],opendata:['LiDO Open Data Twin','Explore location-based ERA5-Land proxy data and apply it to a scenario.'],fieldtwin:['Spatial Field Twin','Explore conceptual apple-orchard and vineyard geometry, rows, and device positions.'],analytics:['Field & Yield Analytics','Explore 30-day environmental trends and transparent modelled yield forecasts.'],comparison:['Open Data vs Sensor Comparison','Evaluate uploaded or labelled demo observations against the ERA5-Land baseline.'],validation:['System Validation','Verify the deployed Python API with live browser-based checks.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
 nav.forEach(b=>b.addEventListener('click',()=>{nav.forEach(x=>x.classList.remove('active'));views.forEach(x=>x.classList.remove('active'));b.classList.add('active');const id=b.dataset.view;document.getElementById(id).classList.add('active');pageTitle.textContent=titles[id][0];pageSub.textContent=titles[id][1];window.scrollTo({top:0,left:0,behavior:'auto'});document.querySelector('.main').scrollTop=0}));
 
 const globalApiHealthEl=document.getElementById('globalApiHealth');
@@ -995,6 +1021,38 @@ advancePilot.addEventListener('click',()=>{const p=pilots.find(x=>x.id===selecte
 deletePilot.addEventListener('click',()=>{if(!selectedPilotId)return;pilots=pilots.filter(p=>p.id!==selectedPilotId);savePilots();selectedPilotId=null;pilotDetailTitle.textContent='Select a pilot';pilotDetailMeta.textContent='Inspect its hypothesis, KPI and progress.';pilotDetailStatus.textContent='No selection';pilotDetailHypothesis.textContent='—';advancePilot.disabled=true;deletePilot.disabled=true;renderPilots()});
 exportPilots.addEventListener('click',()=>{const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),pilots},null,2)],{type:'application/json'}),link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='lido2-pilots.json';link.click();URL.revokeObjectURL(link.href)});
 pilotStart.value=isoDateOffset(18);pilotEnd.value=isoDateOffset(63);renderPilots();
+
+
+let monthlyAnalytics={apple:null,vineyard:null};
+analyticsEnd.value=isoDateOffset(-5);analyticsStart.value=isoDateOffset(-34);
+function dailyEnvironmental(series){
+ const days={};(series||[]).forEach(row=>{const key=row.time.slice(0,10),d=days[key]||(days[key]={temperature:[],soilMoisture:[],vpd:[],precipitation:0,et0:0});if(row.temperature!=null)d.temperature.push(+row.temperature);if(row.soilMoisture!=null)d.soilMoisture.push(+row.soilMoisture*100);if(row.vpd!=null)d.vpd.push(+row.vpd);d.precipitation+=safeNumber(row.precipitation);d.et0+=safeNumber(row.et0)});
+ return Object.entries(days).map(([date,d])=>({date,temperature:d.temperature.reduce((a,b)=>a+b,0)/Math.max(1,d.temperature.length),soilMoisture:d.soilMoisture.reduce((a,b)=>a+b,0)/Math.max(1,d.soilMoisture.length),vpd:d.vpd.reduce((a,b)=>a+b,0)/Math.max(1,d.vpd.length),precipitation:d.precipitation,et0:d.et0}));
+}
+function analyticsPolyline(values,width=700,height=190){
+ const clean=values.filter(Number.isFinite),min=Math.min(...clean),max=Math.max(...clean),span=max-min||1;return values.map((value,index)=>{const x=14+index/Math.max(1,values.length-1)*(width-28),y=height-16-(safeNumber(value,min)-min)/span*(height-32);return x.toFixed(1)+','+y.toFixed(1)}).join(' ');
+}
+function renderAnalyticsChart(svg,days){
+ const grid=[38,76,114,152].map(y=>'<line x1="0" y1="'+y+'" x2="700" y2="'+y+'" stroke="#dfe9e3"/>').join('');svg.innerHTML=grid+'<polyline points="'+analyticsPolyline(days.map(d=>d.temperature))+'" fill="none" stroke="#c45f3c" stroke-width="3"/><polyline points="'+analyticsPolyline(days.map(d=>d.soilMoisture))+'" fill="none" stroke="#2e6d7a" stroke-width="2.5"/>';
+}
+function renderEnvKpis(container,payload,days){
+ const values=[['Mean temp',safeNumber(payload.summary.temperature).toFixed(1)+' °C'],['Rain',safeNumber(payload.summary.precipitation).toFixed(1)+' mm'],['ET₀',safeNumber(payload.summary.et0).toFixed(1)+' mm'],['Stress',safeNumber(payload.summary.waterStressIndex).toFixed(0)+'/100']];container.replaceChildren();values.forEach(([label,value])=>{const box=document.createElement('div'),small=document.createElement('small'),b=document.createElement('b');small.textContent=label;b.textContent=value;box.append(small,b);container.appendChild(box)});
+}
+function yieldTrend(days,baseKgHa){
+ let factor=1;return days.map(day=>{const dailyStress=Math.max(0,(day.vpd-1.6)*.0025)+Math.max(0,(18-day.soilMoisture)*.0015)+Math.max(0,(day.temperature-32)*.001);factor=Math.max(.7,factor-dailyStress);return baseKgHa*factor});
+}
+function renderYield(svg,days,baseKgHa,meta,label,area){
+ const trend=yieldTrend(days,baseKgHa),low=trend.map(v=>v*.9),high=trend.map(v=>v*1.1),grid=[38,76,114,152].map(y=>'<line x1="0" y1="'+y+'" x2="700" y2="'+y+'" stroke="#dfe9e3"/>').join('');svg.innerHTML=grid+'<polyline points="'+analyticsPolyline(high)+'" fill="none" stroke="#9fcab1" stroke-width="2"/><polyline points="'+analyticsPolyline(trend)+'" fill="none" stroke="#1c7a55" stroke-width="4"/><polyline points="'+analyticsPolyline(low)+'" fill="none" stroke="#d7a95c" stroke-width="2"/>';const final=trend.at(-1)||baseKgHa;meta.textContent=label+' forecast: '+(final/1000).toFixed(2)+' t/ha · field total '+(final*area/1000).toFixed(2)+' t · range '+(final*.9/1000).toFixed(2)+'–'+(final*1.1/1000).toFixed(2)+' t/ha · model estimate only.';
+}
+function updateYieldAnalytics(){
+ if(monthlyAnalytics.apple){const days=dailyEnvironmental(monthlyAnalytics.apple.series),base=safeNumber(appleDensity.value)*safeNumber(appleFruitCount.value)*safeNumber(appleFruitWeight.value);renderYield(appleYieldChart,days,base,appleYieldMeta,'Apple',safeNumber(appleArea.value))}
+ if(monthlyAnalytics.vineyard){const days=dailyEnvironmental(monthlyAnalytics.vineyard.series),base=safeNumber(vineDensity.value)*safeNumber(vineClusterCount.value)*safeNumber(vineClusterWeight.value);renderYield(vineYieldChart,days,base,vineYieldMeta,'Vineyard',safeNumber(vineArea.value))}
+}
+async function fetchFieldAnalytics(lat,lon){
+ const params=new URLSearchParams({start_date:analyticsStart.value,end_date:analyticsEnd.value,latitude:String(lat),longitude:String(lon)}),{response,payload}=await fetchJson('/api/open-data/environment?'+params,{headers:{Accept:'application/json'}});if(!response.ok)throw new Error(payload&&payload.detail?payload.detail:'HTTP '+response.status);return payload;
+}
+loadMonthlyAnalytics.addEventListener('click',async()=>{analyticsStatus.className='data-status';analyticsStatus.textContent='Loading both fields…';loadMonthlyAnalytics.disabled=true;try{const [apple,vineyard]=await Promise.all([fetchFieldAnalytics(appleLat.value,appleLon.value),fetchFieldAnalytics(vineLat.value,vineLon.value)]);monthlyAnalytics={apple,vineyard};const appleDays=dailyEnvironmental(apple.series),vineDays=dailyEnvironmental(vineyard.series);renderAnalyticsChart(appleEnvChart,appleDays);renderAnalyticsChart(vineEnvChart,vineDays);renderEnvKpis(appleEnvKpis,apple,appleDays);renderEnvKpis(vineEnvKpis,vineyard,vineDays);appleAnalyticsMeta.textContent=apple.period.start+' to '+apple.period.end+' · proxy '+apple.location.latitude+', '+apple.location.longitude;vineAnalyticsMeta.textContent=vineyard.period.start+' to '+vineyard.period.end+' · proxy '+vineyard.location.latitude+', '+vineyard.location.longitude;updateYieldAnalytics();analyticsStatus.className='data-status ready';analyticsStatus.textContent='30 days loaded'}catch(error){analyticsStatus.className='data-status error';analyticsStatus.textContent=error.message}finally{loadMonthlyAnalytics.disabled=false}});
+[appleArea,appleDensity,appleFruitCount,appleFruitWeight,vineArea,vineDensity,vineClusterCount,vineClusterWeight].forEach(input=>input.addEventListener('input',updateYieldAnalytics));
 
 const dimensions=['Environment','Physiology','Field operations','Product quality','Logistics / process','Economics','Sustainability'];
 const stagesApple=['Planning','Growth','Pre-harvest','Harvest','Packing','Storage','Transport','Retail'];

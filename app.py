@@ -79,10 +79,12 @@ async def open_data_environment(
     days: int = Query(default=7, ge=1, le=31),
     start_date: date | None = None,
     end_date: date | None = None,
+    latitude: float = Query(default=46.3827, ge=45.8, le=46.9),
+    longitude: float = Query(default=11.2881, ge=10.7, le=11.8),
 ) -> dict:
     """Return ERA5-Land proxy data for the LiDO field-lab location."""
     try:
-        return get_environmental_data(start_date=start_date, end_date=end_date, days=days)
+        return get_environmental_data(start_date=start_date, end_date=end_date, days=days, latitude=latitude, longitude=longitude)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except OpenDataError as exc:

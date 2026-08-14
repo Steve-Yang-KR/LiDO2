@@ -72,6 +72,17 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn('data-export-svg="appleEnvChart"', response.text)
         self.assertIn("Low–high range", response.text)
 
+    def test_open_data_replay_controls_are_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("OPEN-DATA REPLAY", response.text)
+        self.assertIn("Not a live LiDO sensor feed", response.text)
+        self.assertIn('id="replayPlay"', response.text)
+        self.assertIn('id="replayPause"', response.text)
+        self.assertIn('id="replaySpeed"', response.text)
+        self.assertIn("renderReplayFrame", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

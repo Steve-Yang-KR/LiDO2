@@ -14,10 +14,13 @@ from urllib.request import Request, urlopen
 
 
 OPEN_METEO_ARCHIVE_URL = "https://archive-api.open-meteo.com/v1/archive"
+OPEN_METEO_MODEL = "era5_land"
+OPEN_METEO_MODEL_LABEL = "ERA5-Land"
 LIDO_LATITUDE = 46.3827
 LIDO_LONGITUDE = 11.2881
 MAX_RANGE_DAYS = 31
 CACHE_TTL_SECONDS = 900
+MAX_GRID_OFFSET_DEGREES = 0.15
 
 HOURLY_VARIABLES = (
     "temperature_2m",
@@ -84,7 +87,59 @@ def _fetch_json(url: str, timeout: float = 15) -> dict[str, Any]:
         raise OpenDataError(f"Open-Meteo request failed: {exc}") from exc
 
 
+def _validate_response_metadata(raw: dict[str, Any]) -> dict[str, Any]:
+    """Validate Open-Meteo metadata before treating the payload as ERA5-Land."""
+    try:
+        response_latitude = float(raw["latitude"])
+        response_longitude = float(raw["longitude"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise OpenDataError("Open-Meteo response is missing valid latitude/longitude metadata") from exc
+
+    if abs(response_latitude - LIDO_LATITUDE) > MAX_GRID_OFFSET_DEGREES:
+        raise OpenDataError("Open-Meteo response latitude is outside the expected ERA5-Land grid area")
+    if abs(response_longitude - LIDO_LONGITUDE) > MAX_GRID_OFFSET_DEGREES:
+        raise OpenDataError("Open-Meteo response longitude is outside the expected ERA5-Land grid area")
+
+    timezone = raw.get("timezone")
+    if timezone != "Europe/Rome":
+        raise OpenDataError(f"Unexpected Open-Meteo timezone: {timezone!r}")
+
+    hourly = raw.get("hourly")
+    hourly_units = raw.get("hourly_units")
+    if not isinstance(hourly, dict) or not isinstance(hourly_units, dict):
+        raise OpenDataError("Open-Meteo response is missing hourly data or unit metadata")
+
+    required_columns = ("time", *HOURLY_VARIABLES)
+    missing_columns = [name for name in required_columns if name not in hourly]
+    missing_units = [name for name in required_columns if name not in hourly_units]
+    if missing_columns or missing_units:
+        details = []
+        if missing_columns:
+            details.append(f"columns={','.join(missing_columns)}")
+        if missing_units:
+            details.append(f"units={','.join(missing_units)}")
+        raise OpenDataError("Open-Meteo response metadata validation failed: " + "; ".join(details))
+
+    return {
+        "provider": "Open-Meteo",
+        "endpoint": OPEN_METEO_ARCHIVE_URL,
+        "requestedModel": OPEN_METEO_MODEL,
+        "modelLabel": OPEN_METEO_MODEL_LABEL,
+        "modelPinned": True,
+        "responseMetadataValidated": True,
+        "responseGrid": {
+            "latitude": response_latitude,
+            "longitude": response_longitude,
+            "elevation": raw.get("elevation"),
+        },
+        "timezone": timezone,
+        "utcOffsetSeconds": raw.get("utc_offset_seconds"),
+        "hourlyUnits": {name: hourly_units[name] for name in required_columns},
+    }
+
+
 def _normalize(raw: dict[str, Any], start_date: date, end_date: date) -> dict[str, Any]:
+    provenance = _validate_response_metadata(raw)
     hourly = raw.get("hourly") or {}
     timestamps = hourly.get("time") or []
     if not timestamps:
@@ -149,13 +204,14 @@ def _normalize(raw: dict[str, Any], start_date: date, end_date: date) -> dict[st
     }
     return {
         "source": "Open-Meteo / ERA5-Land",
+        "provenance": provenance,
         "dataType": "Reanalysis / model estimate",
         "validationStatus": "Proxy data — not validated against LiDO sensors",
         "location": {
             "name": "LiDO field-lab area, Laimburg Research Centre",
             "latitude": LIDO_LATITUDE,
             "longitude": LIDO_LONGITUDE,
-            "timezone": raw.get("timezone", "Europe/Rome"),
+            "timezone": provenance["timezone"],
         },
         "period": {"start": start_date.isoformat(), "end": end_date.isoformat()},
         "summary": summary,
@@ -197,6 +253,7 @@ def get_environmental_data(
             "end_date": end_date.isoformat(),
             "hourly": ",".join(HOURLY_VARIABLES),
             "timezone": "Europe/Rome",
+            "models": OPEN_METEO_MODEL,
         }
     )
     result = _normalize(fetcher(f"{OPEN_METEO_ARCHIVE_URL}?{query}"), start_date, end_date)

@@ -35,7 +35,7 @@ The **System Validation** workspace runs four live checks against the deployed A
 
 The Scenario Lab keeps the interface responsive with an immediate browser preview, then replaces it with the validated Python result. A baseline can be captured at any time to compare quality, yield, water efficiency, waste, value, and confidence.
 
-The **Open Data Twin** uses hourly ERA5-Land reanalysis supplied through Open-Meteo for the LiDO field-lab coordinates. It visualizes weather, radiation, soil moisture, VPD, ET₀, growing degree days, and a transparent water-stress proxy, and can apply compatible environmental values to Scenario Lab. The interface always identifies these values as `Reanalysis / model estimate` and `Proxy data — not validated against LiDO sensors`; they must not be described as LiDO measurements.
+The **Open Data Twin** uses hourly ERA5-Land reanalysis supplied through Open-Meteo for the LiDO field-lab coordinates. The adapter explicitly requests `models=era5_land`, validates the returned grid coordinates, timezone, hourly columns, and unit metadata, and exposes the result in the API `provenance` object. It visualizes weather, radiation, soil moisture, VPD, ET₀, growing degree days, and a transparent water-stress proxy, and can apply compatible environmental values to Scenario Lab. The interface always identifies these values as `Reanalysis / model estimate` and `Proxy data — not validated against LiDO sensors`; they must not be described as LiDO measurements.
 
 ## Run tests
 

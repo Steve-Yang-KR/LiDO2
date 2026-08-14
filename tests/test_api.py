@@ -18,6 +18,20 @@ class ApiValidationTests(unittest.TestCase):
         self.assertEqual(response.json()["status"], "ok")
         self.assertTrue(response.json()["index_available"])
 
+    def test_homepage_exposes_data_trust_center(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Data Trust Center", response.text)
+        self.assertIn("trustMetadata", response.text)
+        self.assertIn("renderDataTrust", response.text)
+
+    def test_homepage_exposes_sensor_comparison_workspace(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Open Data vs Sensor Comparison", response.text)
+        self.assertIn("parseSensorCsv", response.text)
+        self.assertIn("Synthetic demo", response.text)
+
     def test_homepage_exposes_spatial_field_twin(self) -> None:
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)

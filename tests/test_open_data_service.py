@@ -77,6 +77,30 @@ class OpenDataServiceTests(unittest.TestCase):
                 fetcher=lambda _: payload,
             )
 
+    def test_custom_coordinates_are_requested_and_reported(self):
+        requested_urls = []
+        result = get_environmental_data(
+            start_date=date(2026, 7, 4),
+            end_date=date(2026, 7, 4),
+            latitude=46.4,
+            longitude=11.3,
+            fetcher=lambda url: requested_urls.append(url) or fixture_payload(),
+        )
+        self.assertIn("latitude=46.4", requested_urls[0])
+        self.assertIn("longitude=11.3", requested_urls[0])
+        self.assertEqual(result["location"]["latitude"], 46.4)
+        self.assertEqual(result["location"]["longitude"], 11.3)
+
+    def test_coordinates_outside_analysis_boundary_are_rejected(self):
+        with self.assertRaises(ValueError):
+            get_environmental_data(
+                start_date=date(2026, 7, 5),
+                end_date=date(2026, 7, 5),
+                latitude=44.0,
+                longitude=11.3,
+                fetcher=lambda _: fixture_payload(),
+            )
+
     def test_date_range_over_31_days_is_rejected(self):
         with self.assertRaises(ValueError):
             get_environmental_data(

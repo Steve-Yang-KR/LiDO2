@@ -49,6 +49,10 @@ The analytics charts use explicit shared scales, labelled axes, date ticks and h
 
 After loading the 30-day dataset, Field & Yield Analytics automatically replays daily ERA5-Land observations as a smoothly interpolated animated stream. Browser-frame animation eases between observations while fixed 30-day axes prevent visual jumping. Operators can play, pause, reset and select the replay speed while live-style KPI cards, progress, timestamps and frost/heat/dry-soil alerts update. The interface permanently identifies this as historical open-data replay and never presents it as a live LiDO sensor feed. The same control surface is designed to accept a genuine sensor stream later without changing the provenance labels.
 
+## Crop-specific phenology models
+
+Apple and Chardonnay no longer share one generic yield curve. The transparent browser model uses separate calendar phenology, GDD bases (apple 4 °C; vineyard 10 °C), sigmoid biomass/yield accumulation, stage-specific water/heat/VPD sensitivity and crop-specific uncertainty (apple ±8%; vineyard ±12%). Apple stages include flowering, fruit set, fruit enlargement and ripening; Chardonnay includes budbreak, flowering/fruit set, berry growth, véraison and ripening. A separate 0–100 quality-index curve is shown against the right axis. These are exploratory model estimates, not calibrated LiDO crop-model outputs or measured growth.
+
 ## Run tests
 
 ```bash

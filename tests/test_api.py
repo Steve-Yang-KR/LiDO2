@@ -62,6 +62,16 @@ class ApiValidationTests(unittest.TestCase):
         self.assertEqual(kwargs["latitude"], 46.4)
         self.assertEqual(kwargs["longitude"], 11.3)
 
+    def test_scientific_chart_controls_are_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("scientificTooltip", response.text)
+        self.assertIn("chartScale", response.text)
+        self.assertIn("Export CSV", response.text)
+        self.assertIn('data-export-svg="appleEnvChart"', response.text)
+        self.assertIn("Low–high range", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

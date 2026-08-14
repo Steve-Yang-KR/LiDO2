@@ -41,6 +41,10 @@ The **Open Data Twin** uses hourly ERA5-Land reanalysis supplied through Open-Me
 
 The Field & Yield Analytics workspace compares separate user-entered apple and vineyard coordinates over a 30-day ERA5-Land window. Environmental charts show model estimates; editable crop-density and fruit/cluster assumptions drive transparent low/base/high yield forecasts. Default coordinates are explicitly labelled as unverified proxies, and all yield results are labelled as model forecasts rather than measured LiDO yields.
 
+## Scientific chart controls
+
+The analytics charts use explicit shared scales, labelled axes, date ticks and hover tooltips. Environment plots combine temperature, soil-moisture and precipitation views with visible frost (0 °C) and heat (32 °C) reference thresholds. Yield plots keep low/base/high forecasts on one scale and shade the ±10% model range. Loaded daily data can be exported as CSV, and each chart can be downloaded as PNG for reports.
+
 ## Run tests
 
 ```bash

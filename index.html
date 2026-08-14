@@ -82,6 +82,22 @@ button,input,select{font:inherit}
 @media(max-width:680px){.command-copy h2{font-size:28px}.home-search{flex-direction:column}.dynamic-feature-grid,.signal-strip{grid-template-columns:1fr}.live-orbit{min-height:320px}.oi1{left:0}.oi2{right:0}.oi3{left:0}.oi4{right:0}}
 
 
+.trust-center{border:1px solid #c9ded2;background:linear-gradient(135deg,#f8fcfa,#eef7f2)}
+.trust-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.trust-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;background:#e7efe9;color:#60736a;font-size:11px;font-weight:850}
+.trust-badge.verified{background:#dff3e7;color:#17633f}
+.trust-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.trust-item{border:1px solid var(--line);border-radius:11px;background:#fff;padding:9px;min-width:0}
+.trust-item small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;font-weight:800}
+.trust-item b{display:block;margin-top:4px;font-size:12px;overflow-wrap:anywhere}
+.trust-note{margin:9px 0 0;padding:8px 10px;border-left:3px solid var(--warn);background:#fff9ed;color:#6f592f;font-size:11px;line-height:1.45}
+.unit-list{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.unit-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 7px;font-size:10px;color:var(--muted)}
+@media(max-width:900px){.trust-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.compare-controls{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.compare-controls label{display:grid;gap:4px;font-size:11px;font-weight:800}.compare-controls input[type=file]{max-width:260px}
+.compare-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}.compare-kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}.compare-kpi small{color:var(--muted);display:block}.compare-kpi b{font-size:20px;display:block;margin-top:3px}
+.source-warning{border-left:3px solid var(--warn);background:#fff8e9;padding:9px 11px;font-size:11px;line-height:1.5;margin-top:10px}.comparison-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px}.comparison-table th,.comparison-table td{padding:7px;border-bottom:1px solid var(--line);text-align:right}.comparison-table th:first-child,.comparison-table td:first-child{text-align:left}
+@media(max-width:800px){.compare-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .field-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(260px,.7fr);gap:12px}.field-map{position:relative;min-height:460px;border:1px solid #cbded3;border-radius:16px;background:linear-gradient(145deg,#dcebd7,#f2ead7);overflow:hidden;padding:18px}.field-map.vineyard{background:linear-gradient(145deg,#e4e6cf,#efe0c6)}
 .field-rows{display:grid;gap:7px;transform:rotate(-4deg);margin:35px 28px}.field-row{height:22px;border-radius:999px;background:repeating-linear-gradient(90deg,#2d7a4d 0 8px,#8fc89d 8px 14px);border:2px solid rgba(255,255,255,.8);cursor:pointer;position:relative}.field-row:hover,.field-row.active{outline:3px solid #ffd25d}.field-row span{position:absolute;left:-38px;font-size:10px;font-weight:900;color:#315443}
 .field-marker{position:absolute;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;color:white;background:#2e6d7a;border:2px solid white;box-shadow:0 3px 8px #0003}.field-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:10px;margin-top:10px}.field-legend span:before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:#2e6d7a;margin-right:4px}.field-legend span:nth-child(2):before{background:#b77b1d}.field-legend span:nth-child(3):before{background:#7b5db5}
@@ -103,6 +119,7 @@ button,input,select{font:inherit}
     <button data-view="stakeholders">👥 Stakeholders</button>
     <button data-view="opendata">🌦 Open Data Twin</button>
     <button data-view="fieldtwin">🗺 Spatial Field Twin</button>
+    <button data-view="comparison">📐 Data Comparison</button>
     <button data-view="validation">✅ System Validation</button>
     <button data-view="platform">⚙ Architecture</button>
   </nav>
@@ -572,6 +589,25 @@ button,input,select{font:inherit}
       <p class="muted" id="openDataMeta" style="font-size:11px;margin-bottom:0">Location: LiDO field-lab area · waiting for data</p>
     </div>
 
+    <div class="card trust-center" style="margin-top:13px">
+      <div class="trust-head">
+        <div><h3 style="margin-bottom:3px">Data Trust Center</h3><p class="muted" style="margin:0">Machine-checked provenance for the currently loaded environmental dataset.</p></div>
+        <span class="trust-badge" id="trustBadge">Waiting for validation</span>
+      </div>
+      <div class="trust-grid">
+        <div class="trust-item"><small>Provider</small><b id="trustProvider">—</b></div>
+        <div class="trust-item"><small>Pinned model</small><b id="trustModel">—</b></div>
+        <div class="trust-item"><small>Response grid</small><b id="trustGrid">—</b></div>
+        <div class="trust-item"><small>Timezone</small><b id="trustTimezone">—</b></div>
+        <div class="trust-item"><small>Model pin</small><b id="trustPinned">Not checked</b></div>
+        <div class="trust-item"><small>Metadata</small><b id="trustMetadata">Not checked</b></div>
+        <div class="trust-item"><small>Observation class</small><b>Reanalysis / estimate</b></div>
+        <div class="trust-item"><small>LiDO validation</small><b>Not validated</b></div>
+      </div>
+      <div class="unit-list" id="trustUnits" aria-label="Validated hourly units"></div>
+      <p class="trust-note">This panel verifies the requested external model and response structure. It does not certify the values as measurements from LiDO sensors.</p>
+    </div>
+
     <div class="grid g4" style="margin-top:13px">
       <div class="metric"><small>Mean temperature</small><b id="odTemperature">—</b><em>2 m air temperature</em></div>
       <div class="metric"><small>Total precipitation</small><b id="odRain">—</b><em>Selected period</em></div>
@@ -607,6 +643,32 @@ button,input,select{font:inherit}
     <div class="grid g2" style="margin-top:14px">
       <div class="card"><h3>Already validated in the field at LiDO</h3><p class="muted">Aigritec's robotic harvester and a precision blossom-thinning robot have both been field-tested in the Laimburg orchards — real precedent for the kind of AI-guided field intervention this platform's Scenario Lab models (see the Flower thinning window preset).</p></div>
       <div class="card"><h3>A proven validation pathway</h3><p class="muted">Printed plant sensors from the Free University of Bozen-Bolzano followed lab → climate chamber → LiDO orchard → prototype improvement before being trusted in the field — the same lab-to-field discipline this platform's Research tab is built around.</p></div>
+    </div>
+  </section>
+
+  <section id="comparison" class="view">
+    <div class="data-source-banner">
+      <div><span class="badge">Upload-ready validation workspace</span><h3>Open Data vs Sensor Comparison</h3><p>Compare ERA5-Land proxy values with uploaded field observations. Until official LiDO access is available, demo observations remain explicitly labelled and cannot be promoted to official measurements.</p></div>
+      <div class="source-meta"><div><small>Open source</small><b>ERA5-Land</b></div><div><small>Sensor source</small><b id="sensorSourceLabel">No sensor data</b></div><div><small>Validation</small><b id="comparisonValidation">Not evaluated</b></div></div>
+    </div>
+    <div class="card" style="margin-top:13px">
+      <div class="section-head"><div><h3>Comparison input</h3><p class="muted">CSV columns: time, temperature, soilMoisture, precipitation</p></div><span class="data-status" id="comparisonStatus">Waiting</span></div>
+      <div class="compare-controls">
+        <button class="primary" id="useDemoSensor">Use labelled demo sensor data</button>
+        <label>Upload sensor CSV<input type="file" id="sensorCsv" accept=".csv,text/csv"></label>
+        <button class="baseline-button" id="runComparison" disabled>Run comparison</button>
+      </div>
+      <p class="source-warning" id="sensorWarning">No LiDO sensor connection is active. Demo data is synthetic and uploaded files are treated as user-provided, unverified observations.</p>
+    </div>
+    <div class="compare-kpis">
+      <div class="compare-kpi"><small>Matched observations</small><b id="cmpCount">—</b></div>
+      <div class="compare-kpi"><small>Temperature bias</small><b id="cmpTempBias">—</b></div>
+      <div class="compare-kpi"><small>Temperature RMSE</small><b id="cmpTempRmse">—</b></div>
+      <div class="compare-kpi"><small>Soil-moisture RMSE</small><b id="cmpSoilRmse">—</b></div>
+    </div>
+    <div class="grid g2" style="margin-top:13px">
+      <div class="card"><h3>Interpretation</h3><p class="muted" id="comparisonInterpretation">Load open data, then provide demo or uploaded sensor observations.</p></div>
+      <div class="card"><h3>Recent matched values</h3><div style="overflow:auto"><table class="comparison-table"><thead><tr><th>Time</th><th>Open °C</th><th>Sensor °C</th><th>Δ °C</th></tr></thead><tbody id="comparisonRows"></tbody></table></div></div>
     </div>
   </section>
 
@@ -671,7 +733,7 @@ button,input,select{font:inherit}
 
 <script>
 const nav=document.querySelectorAll('.nav button'),views=document.querySelectorAll('.view');
-const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],opendata:['LiDO Open Data Twin','Explore location-based ERA5-Land proxy data and apply it to a scenario.'],fieldtwin:['Spatial Field Twin','Explore conceptual apple-orchard and vineyard geometry, rows, and device positions.'],validation:['System Validation','Verify the deployed Python API with live browser-based checks.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
+const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],opendata:['LiDO Open Data Twin','Explore location-based ERA5-Land proxy data and apply it to a scenario.'],fieldtwin:['Spatial Field Twin','Explore conceptual apple-orchard and vineyard geometry, rows, and device positions.'],comparison:['Open Data vs Sensor Comparison','Evaluate uploaded or labelled demo observations against the ERA5-Land baseline.'],validation:['System Validation','Verify the deployed Python API with live browser-based checks.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
 nav.forEach(b=>b.addEventListener('click',()=>{nav.forEach(x=>x.classList.remove('active'));views.forEach(x=>x.classList.remove('active'));b.classList.add('active');const id=b.dataset.view;document.getElementById(id).classList.add('active');pageTitle.textContent=titles[id][0];pageSub.textContent=titles[id][1];window.scrollTo({top:0,left:0,behavior:'auto'});document.querySelector('.main').scrollTop=0}));
 
 const globalApiHealthEl=document.getElementById('globalApiHealth');
@@ -799,9 +861,24 @@ function renderOpenChart(id,rows,primary,secondary){
  const svg=document.getElementById(id);const grid=[38,76,114,152].map(y=>'<line x1="0" y1="'+y+'" x2="700" y2="'+y+'" stroke="#e4ece7"/>').join('');
  svg.innerHTML=grid+'<polyline points="'+chartPolyline(rows,primary)+'" fill="none" stroke="#1c7a55" stroke-width="3" vector-effect="non-scaling-stroke"/><polyline points="'+chartPolyline(rows,secondary)+'" fill="none" stroke="#2e6d7a" stroke-width="2.5" vector-effect="non-scaling-stroke"/>';
 }
+function renderDataTrust(provenance){
+ const p=provenance||{},grid=p.responseGrid||{},units=p.hourlyUnits||{};
+ const verified=p.modelPinned===true&&p.responseMetadataValidated===true;
+ trustBadge.textContent=verified?'Verified provenance':'Provenance not verified';
+ trustBadge.className='trust-badge'+(verified?' verified':'');
+ trustProvider.textContent=p.provider||'Unknown';
+ trustModel.textContent=(p.modelLabel||p.requestedModel||'Unknown')+(p.requestedModel?' · '+p.requestedModel:'');
+ trustGrid.textContent=Number.isFinite(Number(grid.latitude))&&Number.isFinite(Number(grid.longitude))?Number(grid.latitude).toFixed(4)+', '+Number(grid.longitude).toFixed(4)+(grid.elevation!=null?' · '+grid.elevation+' m':''):'Unavailable';
+ trustTimezone.textContent=p.timezone||'Unknown';
+ trustPinned.textContent=p.modelPinned===true?'Passed':'Failed';
+ trustMetadata.textContent=p.responseMetadataValidated===true?'Passed':'Failed';
+ trustUnits.replaceChildren();
+ Object.entries(units).forEach(([name,unit])=>{const chip=document.createElement('span');chip.className='unit-chip';chip.textContent=name+' · '+unit;trustUnits.appendChild(chip)});
+}
 function renderOpenData(payload){
  const s=payload.summary,rows=payload.series||[];
  openSource.textContent=payload.source;openType.textContent=payload.dataType;openValidation.textContent=payload.validationStatus;
+ renderDataTrust(payload.provenance);
  odTemperature.textContent=safeNumber(s.temperature).toFixed(1)+' °C';odRain.textContent=safeNumber(s.precipitation).toFixed(1)+' mm';odSoil.textContent=safeNumber(s.soilMoisture).toFixed(1)+'%';odVpd.textContent=safeNumber(s.vpd).toFixed(2)+' kPa';odEt0.textContent=safeNumber(s.et0).toFixed(1)+' mm';odGdd.textContent=safeNumber(s.growingDegreeDays).toFixed(1);odStress.textContent=safeNumber(s.waterStressIndex).toFixed(0)+'/100';odSolar.textContent=safeNumber(s.solarRadiation).toFixed(0)+' W/m²';
  openDataMeta.textContent=payload.location.name+' · '+payload.period.start+' to '+payload.period.end+' · retrieved '+payload.retrievedAt+' · cache '+payload.cacheStatus;
  renderOpenChart('climateChart',rows,'temperature','vpd');renderOpenChart('waterChart',rows,'soilMoisture','precipitation');
@@ -812,7 +889,7 @@ async function loadOpenData(){
   const params=new URLSearchParams({start_date:openStartEl.value,end_date:openEndEl.value});
   const {response,payload}=await fetchJson('/api/open-data/environment?'+params.toString(),{headers:{Accept:'application/json'}});
   if(!response.ok||!payload)throw new Error(payload&&payload.detail?payload.detail:'Open-data API returned HTTP '+response.status);
-  latestOpenData=payload;renderOpenData(payload);applyOpenDataEl.disabled=false;openDataStatusEl.className='data-status ready';openDataStatusEl.textContent='Connected · '+payload.model;
+  latestOpenData=payload;renderOpenData(payload);applyOpenDataEl.disabled=false;openDataStatusEl.className='data-status ready';openDataStatusEl.textContent='Connected · '+((payload.provenance&&payload.provenance.modelLabel)||payload.model||'validated source');
  }catch(error){openDataStatusEl.className='data-status error';openDataStatusEl.textContent='Unavailable · '+error.message;applyOpenDataEl.disabled=true}
  finally{loadOpenDataEl.disabled=false}
 }
@@ -834,6 +911,34 @@ applyOpenDataEl.addEventListener('click',()=>{
 });
 setTimeout(loadOpenData,250);
 
+let comparisonSensorRows=[],comparisonSensorKind='none';
+function parseSensorCsv(text){
+ const lines=text.trim().split(/\r?\n/).filter(Boolean);if(lines.length<2)throw new Error('CSV requires a header and at least one row');
+ const headers=lines[0].split(',').map(x=>x.trim());const required=['time','temperature','soilMoisture','precipitation'];
+ required.forEach(name=>{if(!headers.includes(name))throw new Error('Missing CSV column: '+name)});
+ return lines.slice(1).map(line=>{const values=line.split(',');const row={};headers.forEach((h,i)=>row[h]=values[i]?.trim());return {time:row.time,temperature:Number(row.temperature),soilMoisture:Number(row.soilMoisture),precipitation:Number(row.precipitation)}}).filter(row=>row.time&&Number.isFinite(row.temperature));
+}
+function demoSensorRows(){
+ const rows=(latestOpenData&&latestOpenData.series)||[];
+ return rows.map((row,index)=>({time:row.time,temperature:safeNumber(row.temperature)+Math.sin(index/3)*0.7+0.25,soilMoisture:safeNumber(row.soilMoisture)*100+Math.cos(index/4)*1.8,precipitation:safeNumber(row.precipitation)}));
+}
+function rmse(values){return values.length?Math.sqrt(values.reduce((sum,v)=>sum+v*v,0)/values.length):NaN}
+function runSensorComparison(){
+ if(!latestOpenData||!comparisonSensorRows.length)return;
+ const openByTime=new Map((latestOpenData.series||[]).map(row=>[row.time,row])),matched=[];
+ comparisonSensorRows.forEach(sensor=>{const open=openByTime.get(sensor.time);if(open)matched.push({sensor,open})});
+ const tempDiff=matched.map(x=>x.sensor.temperature-safeNumber(x.open.temperature));
+ const soilDiff=matched.filter(x=>Number.isFinite(x.sensor.soilMoisture)).map(x=>x.sensor.soilMoisture-safeNumber(x.open.soilMoisture)*100);
+ const bias=tempDiff.length?tempDiff.reduce((a,b)=>a+b,0)/tempDiff.length:NaN,tempRmse=rmse(tempDiff),soilRmse=rmse(soilDiff);
+ cmpCount.textContent=String(matched.length);cmpTempBias.textContent=Number.isFinite(bias)?bias.toFixed(2)+' °C':'—';cmpTempRmse.textContent=Number.isFinite(tempRmse)?tempRmse.toFixed(2)+' °C':'—';cmpSoilRmse.textContent=Number.isFinite(soilRmse)?soilRmse.toFixed(2)+' pp':'—';
+ comparisonValidation.textContent=comparisonSensorKind==='demo'?'Demo only · not validated':'Uploaded · unverified';
+ comparisonStatus.className='data-status ready';comparisonStatus.textContent='Compared · '+matched.length+' matches';
+ comparisonInterpretation.textContent=matched.length?'The metrics quantify agreement with ERA5-Land for this uploaded/demo window. They do not establish sensor accuracy or scientific validation.':'No timestamps matched. Use ISO hourly timestamps matching the open-data window.';
+ comparisonRows.replaceChildren();matched.slice(-8).reverse().forEach(x=>{const tr=document.createElement('tr');[x.sensor.time,safeNumber(x.open.temperature).toFixed(1),x.sensor.temperature.toFixed(1),(x.sensor.temperature-safeNumber(x.open.temperature)).toFixed(1)].forEach(value=>{const td=document.createElement('td');td.textContent=value;tr.appendChild(td)});comparisonRows.appendChild(tr)});
+}
+useDemoSensor.addEventListener('click',()=>{if(!latestOpenData){comparisonStatus.textContent='Load Open Data Twin first';return}comparisonSensorRows=demoSensorRows();comparisonSensorKind='demo';sensorSourceLabel.textContent='Synthetic demo';sensorWarning.textContent='Synthetic demo observations are active. They are generated only to test the comparison workflow and are not LiDO measurements.';runComparison.disabled=false;runSensorComparison()});
+sensorCsv.addEventListener('change',async event=>{try{const file=event.target.files[0];if(!file)return;comparisonSensorRows=parseSensorCsv(await file.text());comparisonSensorKind='uploaded';sensorSourceLabel.textContent='User-uploaded CSV';sensorWarning.textContent='Uploaded observations are stored only in this browser session and remain unverified until source, calibration and ownership are confirmed.';runComparison.disabled=false;comparisonStatus.textContent='CSV loaded · '+comparisonSensorRows.length+' rows'}catch(error){comparisonStatus.className='data-status error';comparisonStatus.textContent=error.message;runComparison.disabled=true}});
+runComparison.addEventListener('click',runSensorComparison);
 
 const fieldDefinitions={
  apple:{label:'Apple orchard',detail:'Rosy Glow Pink Lady® · conceptual robot-compatible rows',rows:10,assets:[['W-01','Weather station','Planned environmental reference'],['S-04','Soil node','0–30 cm profile placeholder'],['C-02','Canopy camera','Imaging integration point'],['IRR-A','Irrigation zone','North block control area']]},

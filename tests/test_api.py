@@ -70,7 +70,7 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("chartScale", response.text)
         self.assertIn("Export CSV", response.text)
         self.assertIn('data-export-svg="appleEnvChart"', response.text)
-        self.assertIn("Low–high range", response.text)
+        self.assertIn("Crop-specific range", response.text)
 
     def test_open_data_replay_controls_are_served(self) -> None:
         response = self.client.get("/")

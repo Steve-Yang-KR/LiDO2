@@ -98,6 +98,11 @@ button,input,select{font:inherit}
 .compare-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}.compare-kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}.compare-kpi small{color:var(--muted);display:block}.compare-kpi b{font-size:20px;display:block;margin-top:3px}
 .source-warning{border-left:3px solid var(--warn);background:#fff8e9;padding:9px 11px;font-size:11px;line-height:1.5;margin-top:10px}.comparison-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px}.comparison-table th,.comparison-table td{padding:7px;border-bottom:1px solid var(--line);text-align:right}.comparison-table th:first-child,.comparison-table td:first-child{text-align:left}
 @media(max-width:800px){.compare-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.field-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(260px,.7fr);gap:12px}.field-map{position:relative;min-height:460px;border:1px solid #cbded3;border-radius:16px;background:linear-gradient(145deg,#dcebd7,#f2ead7);overflow:hidden;padding:18px}.field-map.vineyard{background:linear-gradient(145deg,#e4e6cf,#efe0c6)}
+.field-rows{display:grid;gap:7px;transform:rotate(-4deg);margin:35px 28px}.field-row{height:22px;border-radius:999px;background:repeating-linear-gradient(90deg,#2d7a4d 0 8px,#8fc89d 8px 14px);border:2px solid rgba(255,255,255,.8);cursor:pointer;position:relative}.field-row:hover,.field-row.active{outline:3px solid #ffd25d}.field-row span{position:absolute;left:-38px;font-size:10px;font-weight:900;color:#315443}
+.field-marker{position:absolute;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;color:white;background:#2e6d7a;border:2px solid white;box-shadow:0 3px 8px #0003}.field-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:10px;margin-top:10px}.field-legend span:before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:#2e6d7a;margin-right:4px}.field-legend span:nth-child(2):before{background:#b77b1d}.field-legend span:nth-child(3):before{background:#7b5db5}
+.asset-list{display:grid;gap:7px;margin-top:9px}.asset{border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px;cursor:pointer}.asset.active{border-color:var(--accent);background:var(--soft)}.asset small{color:var(--muted);display:block;margin-top:3px}
+@media(max-width:900px){.field-layout{grid-template-columns:1fr}.field-map{min-height:390px}}
 </style>
 </head>
 <body>
@@ -113,6 +118,7 @@ button,input,select{font:inherit}
     <button data-view="copilot">🤖 AI Copilot</button>
     <button data-view="stakeholders">👥 Stakeholders</button>
     <button data-view="opendata">🌦 Open Data Twin</button>
+    <button data-view="fieldtwin">🗺 Spatial Field Twin</button>
     <button data-view="comparison">📐 Data Comparison</button>
     <button data-view="validation">✅ System Validation</button>
     <button data-view="platform">⚙ Architecture</button>
@@ -666,6 +672,29 @@ button,input,select{font:inherit}
     </div>
   </section>
 
+  <section id="fieldtwin" class="view">
+    <div class="data-source-banner">
+      <div><span class="badge">Spatial planning prototype</span><h3>Apple Orchard & Vineyard Field Twin</h3><p>Explore plots, rows, plant groups and planned device locations without requiring a live LiDO database connection.</p></div>
+      <div class="source-meta"><div><small>Geometry</small><b>Conceptual layout</b></div><div><small>Assets</small><b id="fieldAssetCount">12 mapped</b></div><div><small>Live telemetry</small><b>Not connected</b></div></div>
+    </div>
+    <div class="card" style="margin-top:13px">
+      <div class="section-head"><div><h3>Field selector</h3><p class="muted">Switch the conceptual layout and inspect rows or devices.</p></div><div><button class="primary" id="showAppleField">Apple · Rosy Glow</button> <button class="baseline-button" id="showVineyardField">Vineyard · Chardonnay</button></div></div>
+    </div>
+    <div class="field-layout" style="margin-top:13px">
+      <div class="field-map" id="spatialFieldMap">
+        <div class="field-rows" id="spatialRows"></div>
+        <span class="field-marker" style="left:18%;top:18%" title="Weather station">W</span>
+        <span class="field-marker" style="left:72%;top:27%;background:#b77b1d" title="Soil node">S</span>
+        <span class="field-marker" style="left:43%;top:67%;background:#7b5db5" title="Camera">C</span>
+      </div>
+      <div class="card">
+        <span class="badge" id="fieldTypeBadge">Apple orchard</span><h3 id="fieldSelectionTitle">Select a row or device</h3><p class="muted" id="fieldSelectionDetail">Conceptual geometry only. No official LiDO coordinates are claimed.</p>
+        <div class="asset-list" id="fieldAssets"></div>
+        <div class="field-legend"><span>Weather</span><span>Soil</span><span>Imaging</span></div>
+      </div>
+    </div>
+  </section>
+
   <section id="validation" class="view">
     <div class="validation-hero">
       <div>
@@ -704,7 +733,7 @@ button,input,select{font:inherit}
 
 <script>
 const nav=document.querySelectorAll('.nav button'),views=document.querySelectorAll('.view');
-const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],opendata:['LiDO Open Data Twin','Explore location-based ERA5-Land proxy data and apply it to a scenario.'],comparison:['Open Data vs Sensor Comparison','Evaluate uploaded or labelled demo observations against the ERA5-Land baseline.'],validation:['System Validation','Verify the deployed Python API with live browser-based checks.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
+const titles={home:['Platform overview','Explore wider lifecycle dimensions and deeper stakeholder-specific controls.'],matrix:['Digital Twin Matrix','Connect lifecycle stages with scientific, operational, quality, economic, and sustainability dimensions.'],scenario:['Scenario Laboratory','Change 30+ parameters and see field-to-market consequences.'],stakeholders:['Stakeholder Workspaces','The same twin presents different decisions to each user.'],copilot:['AI Copilot','Configure objective, response style, and risk tolerance.'],research:['Research Workspace','Translate scenarios into testable hypotheses and validation plans.'],quality:['Value-Chain Twin','Propagate field decisions into quality, waste, and economic outcomes.'],opendata:['LiDO Open Data Twin','Explore location-based ERA5-Land proxy data and apply it to a scenario.'],fieldtwin:['Spatial Field Twin','Explore conceptual apple-orchard and vineyard geometry, rows, and device positions.'],comparison:['Open Data vs Sensor Comparison','Evaluate uploaded or labelled demo observations against the ERA5-Land baseline.'],validation:['System Validation','Verify the deployed Python API with live browser-based checks.'],platform:['Platform Architecture','A modular foundation for long-term international use.']};
 nav.forEach(b=>b.addEventListener('click',()=>{nav.forEach(x=>x.classList.remove('active'));views.forEach(x=>x.classList.remove('active'));b.classList.add('active');const id=b.dataset.view;document.getElementById(id).classList.add('active');pageTitle.textContent=titles[id][0];pageSub.textContent=titles[id][1];window.scrollTo({top:0,left:0,behavior:'auto'});document.querySelector('.main').scrollTop=0}));
 
 const globalApiHealthEl=document.getElementById('globalApiHealth');
@@ -910,6 +939,19 @@ function runSensorComparison(){
 useDemoSensor.addEventListener('click',()=>{if(!latestOpenData){comparisonStatus.textContent='Load Open Data Twin first';return}comparisonSensorRows=demoSensorRows();comparisonSensorKind='demo';sensorSourceLabel.textContent='Synthetic demo';sensorWarning.textContent='Synthetic demo observations are active. They are generated only to test the comparison workflow and are not LiDO measurements.';runComparison.disabled=false;runSensorComparison()});
 sensorCsv.addEventListener('change',async event=>{try{const file=event.target.files[0];if(!file)return;comparisonSensorRows=parseSensorCsv(await file.text());comparisonSensorKind='uploaded';sensorSourceLabel.textContent='User-uploaded CSV';sensorWarning.textContent='Uploaded observations are stored only in this browser session and remain unverified until source, calibration and ownership are confirmed.';runComparison.disabled=false;comparisonStatus.textContent='CSV loaded · '+comparisonSensorRows.length+' rows'}catch(error){comparisonStatus.className='data-status error';comparisonStatus.textContent=error.message;runComparison.disabled=true}});
 runComparison.addEventListener('click',runSensorComparison);
+
+const fieldDefinitions={
+ apple:{label:'Apple orchard',detail:'Rosy Glow Pink Lady® · conceptual robot-compatible rows',rows:10,assets:[['W-01','Weather station','Planned environmental reference'],['S-04','Soil node','0–30 cm profile placeholder'],['C-02','Canopy camera','Imaging integration point'],['IRR-A','Irrigation zone','North block control area']]},
+ vineyard:{label:'Vineyard',detail:'Chardonnay · conceptual terraced slope layout',rows:8,assets:[['W-02','Weather station','Terrace reference point'],['S-11','Soil node','Slope moisture placeholder'],['C-05','Canopy camera','Vine-row imaging point'],['IRR-V','Irrigation zone','Terrace control area']]}
+};
+let activeField='apple';
+function renderSpatialField(type){
+ activeField=type;const field=fieldDefinitions[type];spatialFieldMap.className='field-map'+(type==='vineyard'?' vineyard':'');fieldTypeBadge.textContent=field.label;fieldSelectionTitle.textContent=field.label;fieldSelectionDetail.textContent=field.detail+' · geometry is illustrative, not surveyed LiDO data.';spatialRows.replaceChildren();
+ for(let i=1;i<=field.rows;i++){const row=document.createElement('button');row.className='field-row';row.type='button';const label=document.createElement('span');label.textContent='R'+String(i).padStart(2,'0');row.appendChild(label);row.addEventListener('click',()=>{document.querySelectorAll('#spatialRows .field-row').forEach(x=>x.classList.remove('active'));row.classList.add('active');fieldSelectionTitle.textContent=field.label+' · Row '+i;fieldSelectionDetail.textContent='Plant-group and sensor assignments can be attached here once surveyed geometry is available.'});spatialRows.appendChild(row)}
+ fieldAssets.replaceChildren();field.assets.forEach(([id,name,detail])=>{const card=document.createElement('button');card.className='asset';card.type='button';card.innerHTML='<b></b><small></small>';card.querySelector('b').textContent=id+' · '+name;card.querySelector('small').textContent=detail;card.addEventListener('click',()=>{document.querySelectorAll('#fieldAssets .asset').forEach(x=>x.classList.remove('active'));card.classList.add('active');fieldSelectionTitle.textContent=id+' · '+name;fieldSelectionDetail.textContent=detail+' · status: planned/unconnected.'});fieldAssets.appendChild(card)});
+ fieldAssetCount.textContent=(field.rows+field.assets.length)+' mapped';showAppleField.className=type==='apple'?'primary':'baseline-button';showVineyardField.className=type==='vineyard'?'primary':'baseline-button';
+}
+showAppleField.addEventListener('click',()=>renderSpatialField('apple'));showVineyardField.addEventListener('click',()=>renderSpatialField('vineyard'));renderSpatialField('apple');
 
 const dimensions=['Environment','Physiology','Field operations','Product quality','Logistics / process','Economics','Sustainability'];
 const stagesApple=['Planning','Growth','Pre-harvest','Harvest','Packing','Storage','Transport','Retail'];

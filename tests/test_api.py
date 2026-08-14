@@ -32,6 +32,13 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("parseSensorCsv", response.text)
         self.assertIn("Synthetic demo", response.text)
 
+    def test_homepage_exposes_spatial_field_twin(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Apple Orchard & Vineyard Field Twin", response.text)
+        self.assertIn("renderSpatialField", response.text)
+        self.assertIn("Conceptual layout", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

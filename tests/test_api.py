@@ -18,6 +18,13 @@ class ApiValidationTests(unittest.TestCase):
         self.assertEqual(response.json()["status"], "ok")
         self.assertTrue(response.json()["index_available"])
 
+    def test_homepage_exposes_sensor_comparison_workspace(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Open Data vs Sensor Comparison", response.text)
+        self.assertIn("parseSensorCsv", response.text)
+        self.assertIn("Synthetic demo", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

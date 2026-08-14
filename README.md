@@ -47,7 +47,7 @@ The analytics charts use explicit shared scales, labelled axes, date ticks and h
 
 ## Open-data replay mode
 
-After loading the 30-day dataset, Field & Yield Analytics automatically replays daily ERA5-Land observations as an animated stream. Operators can play, pause, reset and select the replay speed while live-style KPI cards, progress, timestamps and frost/heat/dry-soil alerts update. The interface permanently identifies this as historical open-data replay and never presents it as a live LiDO sensor feed. The same control surface is designed to accept a genuine sensor stream later without changing the provenance labels.
+After loading the 30-day dataset, Field & Yield Analytics automatically replays daily ERA5-Land observations as a smoothly interpolated animated stream. Browser-frame animation eases between observations while fixed 30-day axes prevent visual jumping. Operators can play, pause, reset and select the replay speed while live-style KPI cards, progress, timestamps and frost/heat/dry-soil alerts update. The interface permanently identifies this as historical open-data replay and never presents it as a live LiDO sensor feed. The same control surface is designed to accept a genuine sensor stream later without changing the provenance labels.
 
 ## Run tests
 

@@ -83,6 +83,15 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn('id="replaySpeed"', response.text)
         self.assertIn("renderReplayFrame", response.text)
 
+    def test_smooth_replay_animation_is_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("interpolateReplayDay", response.text)
+        self.assertIn("requestAnimationFrame", response.text)
+        self.assertIn("SMOOTH REPLAY", response.text)
+        self.assertIn("domainDays=days", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

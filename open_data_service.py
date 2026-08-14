@@ -21,6 +21,7 @@ LIDO_LONGITUDE = 11.2881
 MAX_RANGE_DAYS = 31
 CACHE_TTL_SECONDS = 900
 MAX_GRID_OFFSET_DEGREES = 0.15
+MAX_REQUEST_OFFSET_DEGREES = 0.5
 
 HOURLY_VARIABLES = (
     "temperature_2m",
@@ -87,7 +88,7 @@ def _fetch_json(url: str, timeout: float = 15) -> dict[str, Any]:
         raise OpenDataError(f"Open-Meteo request failed: {exc}") from exc
 
 
-def _validate_response_metadata(raw: dict[str, Any]) -> dict[str, Any]:
+def _validate_response_metadata(raw: dict[str, Any], requested_latitude: float, requested_longitude: float) -> dict[str, Any]:
     """Validate Open-Meteo metadata before treating the payload as ERA5-Land."""
     try:
         response_latitude = float(raw["latitude"])
@@ -95,9 +96,9 @@ def _validate_response_metadata(raw: dict[str, Any]) -> dict[str, Any]:
     except (KeyError, TypeError, ValueError) as exc:
         raise OpenDataError("Open-Meteo response is missing valid latitude/longitude metadata") from exc
 
-    if abs(response_latitude - LIDO_LATITUDE) > MAX_GRID_OFFSET_DEGREES:
+    if abs(response_latitude - requested_latitude) > MAX_GRID_OFFSET_DEGREES:
         raise OpenDataError("Open-Meteo response latitude is outside the expected ERA5-Land grid area")
-    if abs(response_longitude - LIDO_LONGITUDE) > MAX_GRID_OFFSET_DEGREES:
+    if abs(response_longitude - requested_longitude) > MAX_GRID_OFFSET_DEGREES:
         raise OpenDataError("Open-Meteo response longitude is outside the expected ERA5-Land grid area")
 
     timezone = raw.get("timezone")
@@ -138,8 +139,8 @@ def _validate_response_metadata(raw: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _normalize(raw: dict[str, Any], start_date: date, end_date: date) -> dict[str, Any]:
-    provenance = _validate_response_metadata(raw)
+def _normalize(raw: dict[str, Any], start_date: date, end_date: date, latitude: float, longitude: float) -> dict[str, Any]:
+    provenance = _validate_response_metadata(raw, latitude, longitude)
     hourly = raw.get("hourly") or {}
     timestamps = hourly.get("time") or []
     if not timestamps:
@@ -209,8 +210,8 @@ def _normalize(raw: dict[str, Any], start_date: date, end_date: date) -> dict[st
         "validationStatus": "Proxy data — not validated against LiDO sensors",
         "location": {
             "name": "LiDO field-lab area, Laimburg Research Centre",
-            "latitude": LIDO_LATITUDE,
-            "longitude": LIDO_LONGITUDE,
+            "latitude": latitude,
+            "longitude": longitude,
             "timezone": provenance["timezone"],
         },
         "period": {"start": start_date.isoformat(), "end": end_date.isoformat()},
@@ -224,9 +225,13 @@ def get_environmental_data(
     start_date: date | None = None,
     end_date: date | None = None,
     days: int = 7,
+    latitude: float = LIDO_LATITUDE,
+    longitude: float = LIDO_LONGITUDE,
     fetcher: Any = _fetch_json,
 ) -> dict[str, Any]:
     """Fetch and normalize environmental proxy data for the LiDO field-lab area."""
+    if abs(latitude - LIDO_LATITUDE) > MAX_REQUEST_OFFSET_DEGREES or abs(longitude - LIDO_LONGITUDE) > MAX_REQUEST_OFFSET_DEGREES:
+        raise ValueError("coordinates must remain within the configured LiDO-area analysis boundary")
     if not 1 <= days <= MAX_RANGE_DAYS:
         raise ValueError(f"days must be between 1 and {MAX_RANGE_DAYS}")
     if start_date is None and end_date is None:
@@ -236,7 +241,7 @@ def get_environmental_data(
     assert start_date is not None and end_date is not None
     _validate_dates(start_date, end_date)
 
-    key = f"{start_date}:{end_date}"
+    key = f"{latitude:.5f}:{longitude:.5f}:{start_date}:{end_date}"
     now = time.monotonic()
     with _cache_lock:
         cached = _cache.get(key)
@@ -247,8 +252,8 @@ def get_environmental_data(
 
     query = urlencode(
         {
-            "latitude": LIDO_LATITUDE,
-            "longitude": LIDO_LONGITUDE,
+            "latitude": latitude,
+            "longitude": longitude,
             "start_date": start_date.isoformat(),
             "end_date": end_date.isoformat(),
             "hourly": ",".join(HOURLY_VARIABLES),
@@ -256,7 +261,7 @@ def get_environmental_data(
             "models": OPEN_METEO_MODEL,
         }
     )
-    result = _normalize(fetcher(f"{OPEN_METEO_ARCHIVE_URL}?{query}"), start_date, end_date)
+    result = _normalize(fetcher(f"{OPEN_METEO_ARCHIVE_URL}?{query}"), start_date, end_date, latitude, longitude)
     result["retrievedAt"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     result["cacheStatus"] = "miss"
     with _cache_lock:

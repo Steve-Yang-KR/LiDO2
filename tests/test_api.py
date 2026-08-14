@@ -70,7 +70,7 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("chartScale", response.text)
         self.assertIn("Export CSV", response.text)
         self.assertIn('data-export-svg="appleEnvChart"', response.text)
-        self.assertIn("Low–high range", response.text)
+        self.assertIn("Crop-specific range", response.text)
 
     def test_open_data_replay_controls_are_served(self) -> None:
         response = self.client.get("/")
@@ -91,6 +91,18 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("requestAnimationFrame", response.text)
         self.assertIn("SMOOTH REPLAY", response.text)
         self.assertIn("domainDays=days", response.text)
+
+    def test_crop_specific_phenology_models_are_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("CROP_GROWTH_MODELS", response.text)
+        self.assertIn("cropPhenology", response.text)
+        self.assertIn("Fruit enlargement", response.text)
+        self.assertIn("Véraison", response.text)
+        self.assertIn("baseTemperature:4", response.text)
+        self.assertIn("baseTemperature:10", response.text)
+        self.assertIn("Quality index", response.text)
 
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})

@@ -76,3 +76,15 @@ GitHub Actions runs the scenario-engine and API-validation test jobs for every p
 ## Deploy on Render
 
 Connect this repository as a Render Blueprint. Render reads `render.yaml`, installs the dependencies, starts Uvicorn on the platform-provided port, and checks `/health` before routing traffic.
+
+
+## Apple nursery and training-system twin
+
+The 3D crop view includes a parametric **Training-system Twin** for representative modern apple orchards. Users can independently choose cultivar (Rosy Glow, Gala, Fuji, or Honeycrisp), rootstock (M.9, M.26, or G.41), training system (Tall Spindle, Slender Spindle, Super Spindle, or Biaxis/Fruiting Wall), and tree age. These selections change leaders, branch density and spread, tree scale, fruit colour, trellis geometry, spacing, and the displayed orchard-density assumptions.
+
+The geometry is a configurable representative model, not a LiDO tree scan or a cultivar-identification model. Default Tall Spindle assumptions are aligned with Cornell Cooperative Extension guidance describing approximately 900–1,200 trees per acre and highly feathered nursery trees. The M.9 support warning follows University of Minnesota Extension guidance that M.9 trees require permanent support.
+
+Primary references:
+
+- [Cornell Cooperative Extension — Tall Spindle Planting System](https://rvpadmin.cce.cornell.edu/uploads/doc_156.pdf)
+- [University of Minnesota Extension — Apple rootstocks](https://extension.umn.edu/apple-production/apple-rootstocks)

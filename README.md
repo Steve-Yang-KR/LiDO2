@@ -63,7 +63,7 @@ Until a real LiDO photogrammetry or LiDAR scan is available, the apple twin uses
 
 ## Detailed representative mesh renderer
 
-Realistic and Hologram display modes use the embedded [Apple Tree model by rhcreations](https://sketchfab.com/3d-models/apple-tree-e5e1208e7e734f88b02c5f45c70f8db1), a 67.6k-triangle Sketchfab asset licensed under Creative Commons Attribution. The native mesh viewer provides proper depth, perspective, orbit and zoom. LiDO2 adds cyan hologram colour treatment, scan lines, a moving scan beam, provenance and loading status. Point Cloud mode—and any external-asset failure—continues to use the local procedural renderer. This remains a representative asset, not a LiDO scan.
+Realistic and Hologram display modes use the embedded [Apple Tree model by rhcreations](https://sketchfab.com/3d-models/apple-tree-e5e1208e7e734f88b02c5f45c70f8db1), a 67.6k-triangle Sketchfab asset licensed under Creative Commons Attribution. The native mesh viewer provides proper depth, perspective, orbit and zoom. LiDO2 adds cyan hologram colour treatment, scan lines, a moving scan beam, provenance and loading status. The mesh iframe is shown immediately whenever Realistic or Hologram mode is selected; it is not gated on a potentially missed load event and uses eager loading even though the workspace starts hidden. Point Cloud mode continues to use the local procedural renderer. This remains a representative asset, not a LiDO scan.
 
 ## Run tests
 

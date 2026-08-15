@@ -104,6 +104,18 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("baseTemperature:10", response.text)
         self.assertIn("Quality index", response.text)
 
+    def test_interactive_3d_crop_twin_is_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('data-view="crop3d"', response.text)
+        self.assertIn('id="cropTwinCanvas"', response.text)
+        self.assertIn("renderCropTwin", response.text)
+        self.assertIn("drawAppleTwin", response.text)
+        self.assertIn("drawVineTwin", response.text)
+        self.assertIn("NOT A LIVE LiDO SENSOR TWIN", response.text)
+        self.assertIn('id="cropTwinHorizon"', response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

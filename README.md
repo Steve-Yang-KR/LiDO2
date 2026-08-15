@@ -53,6 +53,10 @@ After loading the 30-day dataset, Field & Yield Analytics automatically replays 
 
 Apple and Chardonnay no longer share one generic yield curve. The transparent browser model uses separate calendar phenology, GDD bases (apple 4 °C; vineyard 10 °C), sigmoid biomass/yield accumulation, stage-specific water/heat/VPD sensitivity and crop-specific uncertainty (apple ±8%; vineyard ±12%). Apple stages include flowering, fruit set, fruit enlargement and ripening; Chardonnay includes budbreak, flowering/fruit set, berry growth, véraison and ripening. A separate 0–100 quality-index curve is shown against the right axis. These are exploratory model estimates, not calibrated LiDO crop-model outputs or measured growth.
 
+## Interactive 3D crop twin
+
+The 3D Crop Twin workspace uses a dependency-free procedural canvas renderer for reliable deployment. Users can rotate and zoom apple-tree or Chardonnay-vine geometry, animate a past/current/future timeline, select 7/14/30-day horizons and change temperature, rainfall and irrigation scenarios. Canopy condition, apple/cluster development, stress, quality and yield indices respond visually and numerically. The visualization is explicitly labelled as an open-data/model estimate—not a live LiDO sensor twin or a calibrated biological reconstruction.
+
 ## Run tests
 
 ```bash

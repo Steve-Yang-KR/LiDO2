@@ -57,6 +57,10 @@ Apple and Chardonnay no longer share one generic yield curve. The transparent br
 
 The 3D Crop Twin workspace uses a dependency-free procedural canvas renderer for reliable deployment. Users can rotate and zoom apple-tree or Chardonnay-vine geometry, animate a past/current/future timeline, select 7/14/30-day horizons and change temperature, rainfall and irrigation scenarios. Canopy condition, apple/cluster development, stress, quality and yield indices respond visually and numerically. The visualization is explicitly labelled as an open-data/model estimate—not a live LiDO sensor twin or a calibrated biological reconstruction.
 
+## Representative hologram tree
+
+Until a real LiDO photogrammetry or LiDAR scan is available, the apple twin uses a clearly labelled representative orchard model. Its denser procedural canopy supports low/medium/high detail levels and realistic, hologram and point-cloud display modes. Hologram mode adds cyan edge glow, horizontal scan lines and a moving scan beam; point-cloud mode renders sparse evidence-style geometry. This is presentation geometry—not field-scanned evidence—and can later be replaced without changing the growth, stress and forecast controls.
+
 ## Run tests
 
 ```bash

@@ -148,6 +148,20 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn('loading="eager"', response.text)
         self.assertIn("MESH VIEWER ACTIVE", response.text)
 
+
+    def test_apple_training_system_twin_is_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('id="appleTwinCultivar"', response.text)
+        self.assertIn('id="appleTwinRootstock"', response.text)
+        self.assertIn('id="appleTwinTraining"', response.text)
+        self.assertIn('id="appleTwinAge"', response.text)
+        self.assertIn("drawTrainingAppleTwin", response.text)
+        self.assertIn("Tall Spindle", response.text)
+        self.assertIn("Biaxis / Fruiting Wall", response.text)
+        self.assertIn("PARAMETRIC TRAINING SYSTEM", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

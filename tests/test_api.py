@@ -162,6 +162,18 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("Biaxis / Fruiting Wall", response.text)
         self.assertIn("PARAMETRIC TRAINING SYSTEM", response.text)
 
+    def test_scientifically_refined_apple_architecture_is_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("rowSpacing", response.text)
+        self.assertIn("fruitLoad", response.text)
+        self.assertIn("exactly 2 leaders", response.text)
+        self.assertIn("No crop", response.text)
+        self.assertIn("Managed full crop", response.text)
+        self.assertIn("rootSpread", response.text)
+        self.assertIn("flat two-leader wall", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

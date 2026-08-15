@@ -1488,35 +1488,57 @@ function twinSeed(i){return Math.sin(i*91.17)*.5+.5}
 function twinScenario(){const time=+cropTwinTime.value/100,temp=+twinTemp.value,rain=+twinRain.value,irrigation=+twinIrrigation.value,horizon=+cropTwinHorizon.value,crop=cropTwinCrop.value,future=Math.max(0,(time-.5)*2),water=(rain*.45+irrigation*.75)/100,heatPenalty=Math.max(0,temp-(crop==='apple'?1.5:2.5))*.045,waterPenalty=Math.max(0,-water)*.16,benefit=Math.max(0,water)*.05,growth=Math.max(.18,Math.min(1.08,.35+time*.63+future*(horizon/30)*(.08+benefit-heatPenalty-waterPenalty))),stress=Math.max(0,Math.min(100,18+future*(Math.max(0,temp)*8+Math.max(0,-rain)*.45-Math.max(0,irrigation)*.25))),quality=Math.max(30,Math.min(96,(crop==='apple'?78:81)+future*(crop==='vineyard'&&water<0&&water>-.25?4:0)-stress*.22)),yieldIndex=Math.max(35,Math.min(108,growth*100-stress*.18));return {time,temp,rain,irrigation,horizon,crop,future,water,growth,stress,quality,yieldIndex}}
 function drawTwinGround(w,h){for(let i=-6;i<=6;i++){twinLine([-6,0,i],[6,0,i],'rgba(89,225,185,.12)',1,w,h);twinLine([i,0,-6],[i,0,6],'rgba(89,225,185,.12)',1,w,h)}twinCtx.fillStyle='rgba(66,220,174,.08)';twinCtx.beginPath();twinCtx.ellipse(w/2,h*.84,w*.3,18,0,0,Math.PI*2);twinCtx.fill()}
 const APPLE_TRAINING_SYSTEMS={
- tall:{label:'Tall Spindle',leaders:1,height:4.1,width:1.35,branches:16,spacing:1.0,density:2500,support:'Permanent trellis'},
- slender:{label:'Slender Spindle',leaders:1,height:3.3,width:1.65,branches:14,spacing:1.5,density:1667,support:'Leader support'},
- super:{label:'Super Spindle',leaders:1,height:2.8,width:.75,branches:10,spacing:.65,density:3500,support:'High-density trellis'},
- biaxis:{label:'Biaxis / Fruiting Wall',leaders:2,height:3.5,width:1.15,branches:18,spacing:1.2,density:2100,support:'Two-axis trellis'}
+ tall:{label:'Tall Spindle',leaders:1,height:3.6,width:1.25,branches:16,spacing:1.0,rowSpacing:3.3,support:'Permanent trellis',profile:'narrow tapered cone'},
+ slender:{label:'Slender Spindle',leaders:1,height:3.2,width:1.45,branches:14,spacing:1.4,rowSpacing:3.4,support:'Leader support',profile:'moderate tapered cone'},
+ super:{label:'Super Spindle',leaders:1,height:2.8,width:.62,branches:10,spacing:.65,rowSpacing:3.2,support:'High-density trellis',profile:'compact vertical column'},
+ biaxis:{label:'Biaxis / Fruiting Wall',leaders:2,height:3.3,width:1.05,branches:16,spacing:1.2,rowSpacing:3.2,support:'Two-axis trellis',profile:'flat two-leader wall'}
 };
-const APPLE_ROOTSTOCKS={m9:{label:'M.9',vigor:.78,support:'Lifetime support'},m26:{label:'M.26',vigor:.9,support:'Support required'},g41:{label:'G.41',vigor:.84,support:'Trellis recommended'}};
-const APPLE_AGES={nursery:{label:'Feathered nursery',growth:.36,fruit:.02},year1:{label:'Year 1',growth:.56,fruit:.16},year3:{label:'Year 3',growth:.84,fruit:.68},mature:{label:'Mature',growth:1,fruit:1}};
-const APPLE_CULTIVARS={rosy:{label:'Rosy Glow',color:'#e84855',harvest:'Late'},gala:{label:'Gala',color:'#e74f36',harvest:'Early'},fuji:{label:'Fuji',color:'#d93b42',harvest:'Late'},honeycrisp:{label:'Honeycrisp',color:'#e85d4e',harvest:'Mid'}};
+const APPLE_ROOTSTOCKS={
+ m9:{label:'M.9',vigor:.78,trunk:.82,rootSpread:.72,support:'Lifetime support'},
+ m26:{label:'M.26',vigor:.94,trunk:1.08,rootSpread:1.08,support:'Support required'},
+ g41:{label:'G.41',vigor:.85,trunk:.96,rootSpread:.9,support:'Trellis recommended'}
+};
+const APPLE_AGES={
+ nursery:{label:'Feathered nursery',growth:.42,fruitLoad:0,fruitLabel:'No crop',branchFactor:.72},
+ year1:{label:'Year 1',growth:.58,fruitLoad:.08,fruitLabel:'Minimal crop',branchFactor:.78},
+ year3:{label:'Year 3',growth:.84,fruitLoad:.48,fruitLabel:'Developing crop',branchFactor:.92},
+ mature:{label:'Mature',growth:1,fruitLoad:.78,fruitLabel:'Managed full crop',branchFactor:1}
+};
+const APPLE_CULTIVARS={
+ rosy:{label:'Rosy Glow',color:'#ef5570',secondary:'#c92f4c',harvest:'Late'},
+ gala:{label:'Gala',color:'#ed6b3d',secondary:'#c9342f',harvest:'Early'},
+ fuji:{label:'Fuji',color:'#c72f3c',secondary:'#8f1f32',harvest:'Late'},
+ honeycrisp:{label:'Honeycrisp',color:'#e9664f',secondary:'#e5b84f',harvest:'Mid'}
+};
 function drawTrainingAppleTwin(s,w,h){
  const system=APPLE_TRAINING_SYSTEMS[appleTwinTraining.value],root=APPLE_ROOTSTOCKS[appleTwinRootstock.value],age=APPLE_AGES[appleTwinAge.value],cultivar=APPLE_CULTIVARS[appleTwinCultivar.value];
- const scale=age.growth*root.vigor*(.72+.28*s.growth),treeH=system.height*scale,stress=s.stress/100,widthFactor=appleTwinTraining.value==='super' ? .72 : 1;
- const trunk='#99704b',wire='rgba(151,203,190,.7)',leaf=stress>.65?'#bd753d':'rgb(38,'+Math.round(177-stress*94)+',82)';
+ const isBiaxis=system.leaders===2,isNursery=appleTwinAge.value==='nursery',scale=age.growth*root.vigor*(.76+.24*s.growth),treeH=system.height*scale,stress=s.stress/100;
+ const trunkWidth=Math.max(4,9*root.trunk*age.growth),trunk='#99704b',wire='rgba(151,203,190,.7)',leaf=stress>.65?'#bd753d':'rgb(38,'+Math.round(177-stress*94)+',82)';
  twinLine([-2.8,0,-.18],[-2.8,system.height+.35,-.18],'#6d7d78',5,w,h);twinLine([2.8,0,-.18],[2.8,system.height+.35,-.18],'#6d7d78',5,w,h);
  for(let level=1;level<=4;level++){const y=system.height*level/4;twinLine([-2.8,y,-.18],[2.8,y,-.18],wire,2,w,h)}
- twinLine([0,0,0],[0,treeH,0],trunk,9,w,h);
- const leaderXs=system.leaders===2?[-.25,.25]:[0];
+ twinLine([0,0,0],[0,isBiaxis?.68:treeH,0],trunk,trunkWidth,w,h);
+ const leaderXs=isBiaxis?[-.34,.34]:[0];
  leaderXs.forEach((leaderX,li)=>{
-   if(system.leaders===2)twinLine([0,.65,0],[leaderX,treeH,0],trunk,6,w,h);
-   const branchCount=Math.max(4,Math.round(system.branches*age.growth));
+   if(isBiaxis)twinLine([0,.62,0],[leaderX,treeH,0],trunk,Math.max(4,trunkWidth*.7),w,h);
+   const branchCount=isNursery?Math.max(8,Math.round(12*age.branchFactor)):Math.max(4,Math.round(system.branches*age.branchFactor*age.growth));
    for(let b=0;b<branchCount;b++){
-     const t=(b+1)/(branchCount+1),y=.55+t*(treeH-.65),side=(b+li)%2?1:-1,taper=1-t;
-     const branchLength=Math.max(.18,system.width*(.35+.65*taper)*widthFactor*age.growth);
-     const z=(twinSeed(b+li*31)-.5)*.34,end=[leaderX+side*branchLength,y+.08, z];
-     twinLine([leaderX,y,0],end,trunk,4,w,h);
-     const leaves=Math.max(2,Math.round(6*age.growth));
-     for(let l=0;l<leaves;l++){const q=(l+1)/(leaves+1),p=[leaderX+(end[0]-leaderX)*q,y+(end[1]-y)*q+(twinSeed(b*13+l)-.5)*.22,z+(twinSeed(b*17+l)-.5)*.28];twinDot(p,.12,leaf,w,h,.68);if(age.fruit>.1&&l===leaves-2&&b%2===0)twinDot([p[0],p[1]-.12,p[2]],.12*age.fruit,cultivar.color,w,h,.95)}
+     const t=(b+1)/(branchCount+1),y=(isNursery?.72:.58)+t*(treeH-(isNursery?.78:.68)),taper=1-t;
+     const side=isBiaxis?(li===0?-1:1):(b%2?1:-1);
+     const baseWidth=isNursery?.72:system.width,superFactor=appleTwinTraining.value==='super'?.62:1,biaxisFactor=isBiaxis?.72:1;
+     const branchLength=Math.max(.16,baseWidth*(.34+.66*taper)*superFactor*biaxisFactor*age.branchFactor);
+     const z=isBiaxis?0:(twinSeed(b+li*31)-.5)*(isNursery?.22:.34),end=[leaderX+side*branchLength,y+(isNursery?.16:.06),z];
+     twinLine([leaderX,y,0],end,trunk,isNursery?3.2:4,w,h);
+     const leaves=Math.max(2,Math.round((isNursery?4:6)*age.growth));
+     for(let l=0;l<leaves;l++){
+       const q=(l+1)/(leaves+1),p=[leaderX+(end[0]-leaderX)*q,y+(end[1]-y)*q+(twinSeed(b*13+l)-.5)*.18,z+(isBiaxis?0:(twinSeed(b*17+l)-.5)*.24)];
+       twinDot(p,isNursery?.09:.12,leaf,w,h,.68);
+       const fruitChance=age.fruitLoad*(.55+.45*s.growth);
+       if(fruitChance>.1&&l===leaves-2&&b%Math.max(2,Math.round(1/fruitChance))===0){twinDot([p[0],p[1]-.12,p[2]],.105+.035*age.fruitLoad,(b+l)%2?cultivar.color:cultivar.secondary,w,h,.95)}
+     }
    }
  });
- appleSystemMeta.textContent=cultivar.label+' · '+root.label+' · '+system.label+' · '+age.label+' | '+system.leaders+' leader'+(system.leaders>1?'s':'')+' · '+system.height.toFixed(1)+' m target · '+system.spacing.toFixed(2)+' m in-row · ~'+system.density.toLocaleString()+' trees/ha · '+system.support+' / '+root.support;
+ const density=Math.round(10000/(system.spacing*system.rowSpacing)),leaderText=system.leaders===2?'exactly 2 leaders':'1 central leader';
+ appleSystemMeta.textContent=cultivar.label+' · '+root.label+' · '+system.label+' · '+age.label+' | '+leaderText+' · '+system.height.toFixed(1)+' m target · '+system.spacing.toFixed(2)+' × '+system.rowSpacing.toFixed(1)+' m spacing · ~'+density.toLocaleString()+' trees/ha · '+age.fruitLabel+' · '+system.profile+' · '+system.support+' / '+root.support;
 }
 function drawAppleTwin(s,w,h){const canopy=s.growth,stress=s.stress/100,sway=Math.sin(twinClock*.0015)*.035;twinLine([0,0,0],[0,3.1,0],'#8f6844',10,w,h);for(let b=0;b<9;b++){const angle=b*2.399+sinSafe(b),height=1.25+(b%4)*.42,length=(1.25+.35*twinSeed(b))*canopy,end=[Math.cos(angle)*length,height+1.05*canopy+Math.sin(twinClock*.001+b)*sway,Math.sin(angle)*length];twinLine([0,height,0],end,'#a47b50',5,w,h);for(let l=0;l<13;l++){const seed=b*17+l,theta=angle+(twinSeed(seed)-.5)*1.8,radius=.35+twinSeed(seed+2)*1.25*canopy,p=[end[0]+Math.cos(theta)*radius,end[1]+(twinSeed(seed+4)-.35)*1.2*canopy,end[2]+Math.sin(theta)*radius],green=Math.round(178-stress*105);twinDot(p,.22,stress>.65?'#d47b3e':'rgb(48,'+green+',105)',w,h,.72+.25*twinSeed(seed));if(l%6===0&&s.time>.28)twinDot([p[0],p[1]-.18,p[2]],.13+.09*s.growth,'#e44848',w,h,.92)}}}
 function drawAppleDetail(s,w,h){const detail=cropTwinDetail.value,count=detail==='high'?320:detail==='medium'?190:90,stress=s.stress/100;for(let i=0;i<count;i++){const golden=2.399963*i,radial=(.45+1.65*twinSeed(i+8))*s.growth,y=.95+2.75*twinSeed(i+21)*s.growth,p=[Math.cos(golden)*radial,y,Math.sin(golden)*radial],leafColor=stress>.65?'#bd753d':'rgb(38,'+Math.round(175-stress*95)+',77)';twinDot(p,.085+.075*twinSeed(i+4),leafColor,w,h,.38+.45*twinSeed(i+5));if(i%37===0&&s.time>.3)twinDot([p[0],p[1]-.13,p[2]],.13+.07*s.growth,s.time>.72?'#e94343':'#91b64d',w,h,.95)}}

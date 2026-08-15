@@ -88,3 +88,8 @@ Primary references:
 
 - [Cornell Cooperative Extension — Tall Spindle Planting System](https://rvpadmin.cce.cornell.edu/uploads/doc_156.pdf)
 - [University of Minnesota Extension — Apple rootstocks](https://extension.umn.edu/apple-production/apple-rootstocks)
+
+
+### Scientific visualization refinements
+
+The representative renderer distinguishes structural variables instead of treating every selection as a different tree species. Cultivar changes fruit colour; rootstock modifies vigor and trunk scale; training system controls leader count, canopy profile and spacing; age controls feathering and crop load. The Biaxis option is constrained to exactly two leaders in one fruiting plane. Nursery trees are displayed as feathered trees with no crop, while Year 1, Year 3 and Mature stages progressively increase managed crop load. Density is calculated from the displayed in-row and row spacing rather than stored as an unrelated fixed value. These remain representative planning assumptions that must be calibrated with LiDO measurements before research or production use.

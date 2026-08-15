@@ -61,6 +61,10 @@ The 3D Crop Twin workspace uses a dependency-free procedural canvas renderer for
 
 Until a real LiDO photogrammetry or LiDAR scan is available, the apple twin uses a clearly labelled representative orchard model. Its denser procedural canopy supports low/medium/high detail levels and realistic, hologram and point-cloud display modes. Hologram mode adds cyan edge glow, horizontal scan lines and a moving scan beam; point-cloud mode renders sparse evidence-style geometry. This is presentation geometry—not field-scanned evidence—and can later be replaced without changing the growth, stress and forecast controls.
 
+## Detailed representative mesh renderer
+
+Realistic and Hologram display modes use the embedded [Apple Tree model by rhcreations](https://sketchfab.com/3d-models/apple-tree-e5e1208e7e734f88b02c5f45c70f8db1), a 67.6k-triangle Sketchfab asset licensed under Creative Commons Attribution. The native mesh viewer provides proper depth, perspective, orbit and zoom. LiDO2 adds cyan hologram colour treatment, scan lines, a moving scan beam, provenance and loading status. Point Cloud mode—and any external-asset failure—continues to use the local procedural renderer. This remains a representative asset, not a LiDO scan.
+
 ## Run tests
 
 ```bash

@@ -128,6 +128,17 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("Point cloud", response.text)
         self.assertIn("NOT A LiDO FIELD SCAN", response.text)
 
+    def test_detailed_mesh_hologram_renderer_is_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('id="cropMeshFrame"', response.text)
+        self.assertIn("e5e1208e7e734f88b02c5f45c70f8db1", response.text)
+        self.assertIn("67.6k-triangle CC BY mesh", response.text)
+        self.assertIn("Apple Tree by rhcreations", response.text)
+        self.assertIn("syncCropMeshMode", response.text)
+        self.assertIn("procedural fallback", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

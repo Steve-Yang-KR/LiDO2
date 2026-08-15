@@ -139,6 +139,15 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("syncCropMeshMode", response.text)
         self.assertIn("procedural fallback", response.text)
 
+    def test_mesh_viewer_is_not_blocked_by_load_event(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(".twin3d-stage.mesh-mode .crop-mesh-frame", response.text)
+        self.assertNotIn(".mesh-ready.mesh-mode", response.text)
+        self.assertIn('loading="eager"', response.text)
+        self.assertIn("MESH VIEWER ACTIVE", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

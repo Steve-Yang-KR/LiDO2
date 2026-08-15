@@ -116,6 +116,18 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("NOT A LIVE LiDO SENSOR TWIN", response.text)
         self.assertIn('id="cropTwinHorizon"', response.text)
 
+    def test_representative_hologram_tree_modes_are_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("REPRESENTATIVE APPLE-TREE MODEL", response.text)
+        self.assertIn('id="cropTwinMode"', response.text)
+        self.assertIn('id="cropTwinDetail"', response.text)
+        self.assertIn("drawAppleDetail", response.text)
+        self.assertIn("Hologram", response.text)
+        self.assertIn("Point cloud", response.text)
+        self.assertIn("NOT A LiDO FIELD SCAN", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

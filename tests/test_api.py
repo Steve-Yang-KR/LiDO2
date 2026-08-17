@@ -255,7 +255,7 @@ class ApiValidationTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn('id="vineyardMeshFrame"', response.text)
-        self.assertIn("https://skfb.ly/6R7wy", response.text)
+        self.assertIn("https://skfb.ly/pwWWD", response.text)
         self.assertIn("resolveVineyardSketchfabModel", response.text)
         self.assertIn("/api/models/vineyard-sketchfab", response.text)
         self.assertIn("active-mesh-frame", response.text)
@@ -268,7 +268,7 @@ class ApiValidationTests(unittest.TestCase):
     def test_vineyard_model_resolver_endpoint(self, mocked_resolver) -> None:
         mocked_resolver.return_value = {
             "embed_url": "https://sketchfab.com/models/example/embed?autostart=1",
-            "source_url": "https://skfb.ly/6R7wy",
+            "source_url": "https://skfb.ly/pwWWD",
             "title": "Vineyard",
             "author_name": "Example",
             "provider_name": "Sketchfab",
@@ -278,7 +278,7 @@ class ApiValidationTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("/embed", response.json()["embed_url"])
-        self.assertEqual(response.json()["source_url"], "https://skfb.ly/6R7wy")
+        self.assertEqual(response.json()["source_url"], "https://skfb.ly/pwWWD")
 
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})

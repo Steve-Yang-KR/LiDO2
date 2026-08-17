@@ -103,3 +103,8 @@ Apple cultivar, rootstock, training-system and tree-age changes now automaticall
 ## Laimburg viticulture meeting default
 
 The 3D Crop Twin now opens in Vineyard mode for the Laimburg discussion. Chardonnay is the representative default, with selectors for cultivar, trial-block geometry and phenology stage. Apple configuration remains available as a secondary crop and is hidden while Vineyard is active. The meeting view prominently states that Laimburg/LiDO measurements are not connected: geometry is representative, phenology is synthetic and environmental values are open-data proxies. Selecting the pending Laimburg block does not imply access to field data.
+
+
+### Responsive Vineyard Hologram Twin
+
+Vineyard mode now supports a live procedural hologram rather than reusing the fixed apple mesh. The hologram includes trellis rows, posts and wires, depth rows, animated scan lines, canopy particles and cultivar-coloured grape clusters. Cultivar, trial block, phenology, detail level, timeline and environmental scenario remain connected while the hologram is active. The Apple hologram continues to use its separately attributed representative mesh; the Vineyard hologram is generated geometry and remains explicitly labelled as synthetic, not a Laimburg scan.

@@ -238,6 +238,18 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn(".sidebar::-webkit-scrollbar-thumb", response.text)
         self.assertIn("overflow-y:visible", response.text)
 
+    def test_detailed_spatial_vineyard_hologram_is_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("drawDetailedVine", response.text)
+        self.assertIn("vineLeaf", response.text)
+        self.assertIn("vineCluster", response.text)
+        self.assertIn("sizeTwinCanvas(vineIntelligenceCanvas,430)", response.text)
+        self.assertIn("rgba(89,63,38,.46)", response.text)
+        self.assertIn("scanY=(twinClock*.04)%ch", response.text)
+        self.assertIn("bezierCurveTo", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

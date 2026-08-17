@@ -113,3 +113,8 @@ Vineyard mode now supports a live procedural hologram rather than reusing the fi
 ### Vineyard hologram intelligence layers
 
 The 3D Vineyard view now contains an interactive intelligence panel beneath the hologram. Users can toggle canopy, soil moisture, cluster maturity, microclimate sensor and terrain/block layers. A spatial canvas draws representative vineyard rows, trial boundaries, three moisture zones and sensor nodes. A second canvas shows a growth trajectory and indicative harvest window. Cultivar, block, phenology and scenario controls update maturity, moisture, harvest timing and synthetic confidence. Validation remains explicitly NOT VALIDATED or WAITING FOR LAIMBURG DATA; none of these values are presented as field measurements.
+
+
+### Detailed spatial vineyard rendering
+
+The Vineyard intelligence canvas has been enlarged and upgraded from simple circles and lines to a layered spatial scene. The foreground row includes curved trunks, bilateral cordons, vertical shoots, shaped leaves and multi-berry clusters; background rows fade into a cyan point-cloud wireframe. Trellis posts and four wire levels, a sloped trial-block outline, animated scan beam, three pulsing sensor nodes, canopy/terrain fields and a stratified soil cross-section share one coordinate system. The rendering remains procedural and representative rather than photogrammetry or a LiDO field scan.

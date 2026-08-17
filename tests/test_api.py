@@ -202,6 +202,17 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("VINEYARD_CULTIVARS", response.text)
         self.assertIn("VINEYARD_STAGES", response.text)
 
+    def test_responsive_vineyard_hologram_is_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Responsive Hologram Twin", response.text)
+        self.assertIn("drawVineHologramDetail", response.text)
+        self.assertIn("VINEYARD HOLOGRAM LIVE", response.text)
+        self.assertIn("Responsive Vineyard Hologram", response.text)
+        self.assertIn("cropTwinCrop.value==='apple'&&cropTwinMode.value==='hologram'", response.text)
+        self.assertIn("particles=cropTwinDetail.value", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

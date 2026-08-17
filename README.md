@@ -108,3 +108,8 @@ The 3D Crop Twin now opens in Vineyard mode for the Laimburg discussion. Chardon
 ### Responsive Vineyard Hologram Twin
 
 Vineyard mode now supports a live procedural hologram rather than reusing the fixed apple mesh. The hologram includes trellis rows, posts and wires, depth rows, animated scan lines, canopy particles and cultivar-coloured grape clusters. Cultivar, trial block, phenology, detail level, timeline and environmental scenario remain connected while the hologram is active. The Apple hologram continues to use its separately attributed representative mesh; the Vineyard hologram is generated geometry and remains explicitly labelled as synthetic, not a Laimburg scan.
+
+
+### Vineyard hologram intelligence layers
+
+The 3D Vineyard view now contains an interactive intelligence panel beneath the hologram. Users can toggle canopy, soil moisture, cluster maturity, microclimate sensor and terrain/block layers. A spatial canvas draws representative vineyard rows, trial boundaries, three moisture zones and sensor nodes. A second canvas shows a growth trajectory and indicative harvest window. Cultivar, block, phenology and scenario controls update maturity, moisture, harvest timing and synthetic confidence. Validation remains explicitly NOT VALIDATED or WAITING FOR LAIMBURG DATA; none of these values are presented as field measurements.

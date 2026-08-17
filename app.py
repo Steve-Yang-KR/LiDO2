@@ -64,7 +64,7 @@ SKETCHFAB_OEMBED_URL = "https://sketchfab.com/oembed"
 def parse_sketchfab_oembed(payload: dict) -> dict[str, str]:
     """Validate a Sketchfab oEmbed response and construct the viewer URL."""
     html = unescape(str(payload.get("html", "")))
-    match = re.search(r'<iframe[^>]+src=["\\']([^"\\']+)["\\']', html, re.IGNORECASE)
+    match = re.search(r"<iframe[^>]+src=['\\\"]([^'\\\"]+)['\\\"]", html, re.IGNORECASE)
     if not match:
         raise ValueError("Sketchfab returned no iframe in its oEmbed response.")
 

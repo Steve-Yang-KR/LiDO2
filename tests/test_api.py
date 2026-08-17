@@ -213,6 +213,21 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("cropTwinCrop.value==='apple'&&cropTwinMode.value==='hologram'", response.text)
         self.assertIn("particles=cropTwinDetail.value", response.text)
 
+    def test_vineyard_hologram_intelligence_layers_are_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('id="vineyardIntelligence"', response.text)
+        self.assertIn('id="vineIntelligenceCanvas"', response.text)
+        self.assertIn('id="vineGrowthCanvas"', response.text)
+        self.assertIn("Vineyard Hologram Intelligence Layers", response.text)
+        self.assertIn("renderVineyardIntelligence", response.text)
+        self.assertIn("vineLayerState", response.text)
+        self.assertIn('data-vine-layer="soil"', response.text)
+        self.assertIn('data-vine-layer="clusters"', response.text)
+        self.assertIn("WAITING FOR LAIMBURG DATA", response.text)
+        self.assertIn("DATA NOT CONNECTED · REPRESENTATIVE MODEL", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

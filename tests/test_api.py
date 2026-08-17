@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, patch
 
 from fastapi.testclient import TestClient
 
-from app import app
+from app import app, parse_sketchfab_oembed
 
 
 class ApiValidationTests(unittest.TestCase):
@@ -263,6 +263,26 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("creator and licence shown by Sketchfab", response.text)
         self.assertNotIn("vineyardMeshFrame.src=shortUrl", response.text)
         self.assertIn("vineyard-mesh-failed", response.text)
+        self.assertIn('id="retryVineyardModel"', response.text)
+        self.assertIn("cache:\'no-store\'", response.text)
+
+    def test_sketchfab_oembed_parser_accepts_protocol_relative_embed(self) -> None:
+        payload = {
+            "html": '<iframe src="//sketchfab.com/models/example/embed?foo=bar"></iframe>',
+            "title": "Vineyard",
+            "author_name": "Example",
+        }
+
+        resolved = parse_sketchfab_oembed(payload)
+
+        self.assertTrue(resolved["embed_url"].startswith("https://sketchfab.com/"))
+        self.assertIn("/embed", resolved["embed_url"])
+        self.assertIn("autostart=1", resolved["embed_url"])
+        self.assertEqual(resolved["title"], "Vineyard")
+
+    def test_sketchfab_oembed_parser_rejects_untrusted_host(self) -> None:
+        with self.assertRaises(ValueError):
+            parse_sketchfab_oembed({"html": '<iframe src="https://example.com/models/x/embed"></iframe>'})
 
     @patch("app.resolve_vineyard_sketchfab_embed", new_callable=AsyncMock)
     def test_vineyard_model_resolver_endpoint(self, mocked_resolver) -> None:

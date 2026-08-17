@@ -174,6 +174,18 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("rootSpread", response.text)
         self.assertIn("flat two-leader wall", response.text)
 
+    def test_apple_factors_are_connected_to_parametric_mode(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('id="factorLinkNotice"', response.text)
+        self.assertIn('id="appleFactorImpact"', response.text)
+        self.assertIn("ensureParametricTwin", response.text)
+        self.assertIn("Fixed representative mesh", response.text)
+        self.assertIn("Display automatically switched", response.text)
+        self.assertIn("Live factor connection", response.text)
+        self.assertIn("Current selection:", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

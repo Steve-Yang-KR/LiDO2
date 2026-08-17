@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from datetime import date
+from html import unescape
 import re
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
@@ -60,39 +61,34 @@ VINEYARD_SKETCHFAB_SHORT_URL = "https://skfb.ly/pwWWD"
 SKETCHFAB_OEMBED_URL = "https://sketchfab.com/oembed"
 
 
-async def resolve_vineyard_sketchfab_embed() -> dict[str, str]:
-    """Resolve the approved Vineyard share link to a frame-safe Sketchfab embed URL."""
-    try:
-        async with httpx.AsyncClient(follow_redirects=True, timeout=12.0) as client:
-            shared = await client.get(VINEYARD_SKETCHFAB_SHORT_URL)
-            shared.raise_for_status()
-            canonical_url = str(shared.url)
-            response = await client.get(SKETCHFAB_OEMBED_URL, params={"url": canonical_url})
-            response.raise_for_status()
-            payload = response.json()
-    except (httpx.HTTPError, ValueError) as exc:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="The Vineyard 3D model could not be resolved from Sketchfab.",
-        ) from exc
-
-    html = str(payload.get("html", ""))
-    match = re.search(r'<iframe[^>]+src=["\']([^"\']+)["\']', html, re.IGNORECASE)
+def parse_sketchfab_oembed(payload: dict) -> dict[str, str]:
+    """Validate a Sketchfab oEmbed response and construct the viewer URL."""
+    html = unescape(str(payload.get("html", "")))
+    match = re.search(r"""<iframe[^>]+src=["']([^"']+)["']""", html, re.IGNORECASE)
     if not match:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Sketchfab returned no embeddable Vineyard model.",
-        )
+        raise ValueError("Sketchfab returned no iframe in its oEmbed response.")
 
-    parts = urlsplit(match.group(1))
-    if parts.scheme != "https" or parts.hostname not in {"sketchfab.com", "www.sketchfab.com"} or "/embed" not in parts.path:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Sketchfab returned an unexpected embed address.",
-        )
+    raw_url = match.group(1)
+    if raw_url.startswith("//"):
+        raw_url = f"https:{raw_url}"
+    parts = urlsplit(raw_url)
+    if (
+        parts.scheme != "https"
+        or parts.hostname not in {"sketchfab.com", "www.sketchfab.com"}
+        or "/embed" not in parts.path
+    ):
+        raise ValueError("Sketchfab returned an unexpected embed address.")
 
     params = dict(parse_qsl(parts.query, keep_blank_values=True))
-    params.update({"autostart": "1", "autospin": "0.12", "ui_theme": "dark", "ui_infos": "0", "ui_hint": "0"})
+    params.update(
+        {
+            "autostart": "1",
+            "autospin": "0.12",
+            "ui_theme": "dark",
+            "ui_infos": "0",
+            "ui_hint": "0",
+        }
+    )
     embed_url = urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(params), ""))
     return {
         "embed_url": embed_url,
@@ -101,6 +97,45 @@ async def resolve_vineyard_sketchfab_embed() -> dict[str, str]:
         "author_name": str(payload.get("author_name", "See Sketchfab model page")),
         "provider_name": "Sketchfab",
     }
+
+
+async def resolve_vineyard_sketchfab_embed() -> dict[str, str]:
+    """Resolve the approved Vineyard share link to a frame-safe Sketchfab embed URL."""
+    headers = {
+        "Accept": "application/json",
+        "User-Agent": "LiDO2/2.4 (+https://github.com/Steve-Yang-KR/LiDO2)",
+    }
+    errors: list[Exception] = []
+    async with httpx.AsyncClient(follow_redirects=True, timeout=12.0, headers=headers) as client:
+        # Sketchfab's oEmbed service can resolve its own skfb.ly share URL. Trying
+        # this first avoids Render being blocked by the public model-page redirect.
+        try:
+            response = await client.get(
+                SKETCHFAB_OEMBED_URL,
+                params={"url": VINEYARD_SKETCHFAB_SHORT_URL, "format": "json"},
+            )
+            response.raise_for_status()
+            return parse_sketchfab_oembed(response.json())
+        except (httpx.HTTPError, ValueError) as exc:
+            errors.append(exc)
+
+        # Compatibility fallback for oEmbed deployments that require a canonical URL.
+        try:
+            shared = await client.get(VINEYARD_SKETCHFAB_SHORT_URL)
+            shared.raise_for_status()
+            response = await client.get(
+                SKETCHFAB_OEMBED_URL,
+                params={"url": str(shared.url), "format": "json"},
+            )
+            response.raise_for_status()
+            return parse_sketchfab_oembed(response.json())
+        except (httpx.HTTPError, ValueError) as exc:
+            errors.append(exc)
+
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail="The Vineyard 3D model could not be resolved from Sketchfab.",
+    ) from errors[-1]
 
 
 @app.get("/api/models/vineyard-sketchfab", tags=["Models"])

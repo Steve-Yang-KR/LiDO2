@@ -3,7 +3,10 @@
 from pathlib import Path
 
 from datetime import date
+import re
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
+import httpx
 from fastapi import FastAPI, HTTPException, Query, status
 from fastapi.responses import FileResponse
 
@@ -51,6 +54,59 @@ async def health() -> dict[str, str | bool]:
         "service": "lido2",
         "index_available": INDEX_FILE.is_file(),
     }
+
+
+VINEYARD_SKETCHFAB_SHORT_URL = "https://skfb.ly/6R7wy"
+SKETCHFAB_OEMBED_URL = "https://sketchfab.com/oembed"
+
+
+async def resolve_vineyard_sketchfab_embed() -> dict[str, str]:
+    """Resolve the approved Vineyard share link to a frame-safe Sketchfab embed URL."""
+    try:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=12.0) as client:
+            shared = await client.get(VINEYARD_SKETCHFAB_SHORT_URL)
+            shared.raise_for_status()
+            canonical_url = str(shared.url)
+            response = await client.get(SKETCHFAB_OEMBED_URL, params={"url": canonical_url})
+            response.raise_for_status()
+            payload = response.json()
+    except (httpx.HTTPError, ValueError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="The Vineyard 3D model could not be resolved from Sketchfab.",
+        ) from exc
+
+    html = str(payload.get("html", ""))
+    match = re.search(r'<iframe[^>]+src=["\']([^"\']+)["\']', html, re.IGNORECASE)
+    if not match:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Sketchfab returned no embeddable Vineyard model.",
+        )
+
+    parts = urlsplit(match.group(1))
+    if parts.scheme != "https" or parts.hostname not in {"sketchfab.com", "www.sketchfab.com"} or "/embed" not in parts.path:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Sketchfab returned an unexpected embed address.",
+        )
+
+    params = dict(parse_qsl(parts.query, keep_blank_values=True))
+    params.update({"autostart": "1", "autospin": "0.12", "ui_theme": "dark", "ui_infos": "0", "ui_hint": "0"})
+    embed_url = urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(params), ""))
+    return {
+        "embed_url": embed_url,
+        "source_url": VINEYARD_SKETCHFAB_SHORT_URL,
+        "title": str(payload.get("title", "Representative Vineyard 3D model")),
+        "author_name": str(payload.get("author_name", "See Sketchfab model page")),
+        "provider_name": "Sketchfab",
+    }
+
+
+@app.get("/api/models/vineyard-sketchfab", tags=["Models"])
+async def vineyard_sketchfab_model() -> dict[str, str]:
+    """Return the resolved frame-safe embed URL for the approved Vineyard model."""
+    return await resolve_vineyard_sketchfab_embed()
 
 
 @app.get("/api/platform-info", tags=["Platform"])

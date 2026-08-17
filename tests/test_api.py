@@ -250,6 +250,19 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("scanY=(twinClock*.04)%ch", response.text)
         self.assertIn("bezierCurveTo", response.text)
 
+    def test_vineyard_sketchfab_model_connection_is_served(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('id="vineyardMeshFrame"', response.text)
+        self.assertIn("https://skfb.ly/6R7wy", response.text)
+        self.assertIn("resolveVineyardSketchfabModel", response.text)
+        self.assertIn("sketchfab.com/oembed", response.text)
+        self.assertIn("active-mesh-frame", response.text)
+        self.assertIn("VINEYARD 3D MODEL ACTIVE", response.text)
+        self.assertIn("creator and licence shown by Sketchfab", response.text)
+        self.assertIn("vineyardMeshFrame.src=shortUrl", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

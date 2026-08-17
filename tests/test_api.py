@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from fastapi.testclient import TestClient
 
@@ -257,11 +257,28 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn('id="vineyardMeshFrame"', response.text)
         self.assertIn("https://skfb.ly/6R7wy", response.text)
         self.assertIn("resolveVineyardSketchfabModel", response.text)
-        self.assertIn("sketchfab.com/oembed", response.text)
+        self.assertIn("/api/models/vineyard-sketchfab", response.text)
         self.assertIn("active-mesh-frame", response.text)
         self.assertIn("VINEYARD 3D MODEL ACTIVE", response.text)
         self.assertIn("creator and licence shown by Sketchfab", response.text)
-        self.assertIn("vineyardMeshFrame.src=shortUrl", response.text)
+        self.assertNotIn("vineyardMeshFrame.src=shortUrl", response.text)
+        self.assertIn("vineyard-mesh-failed", response.text)
+
+    @patch("app.resolve_vineyard_sketchfab_embed", new_callable=AsyncMock)
+    def test_vineyard_model_resolver_endpoint(self, mocked_resolver) -> None:
+        mocked_resolver.return_value = {
+            "embed_url": "https://sketchfab.com/models/example/embed?autostart=1",
+            "source_url": "https://skfb.ly/6R7wy",
+            "title": "Vineyard",
+            "author_name": "Example",
+            "provider_name": "Sketchfab",
+        }
+
+        response = self.client.get("/api/models/vineyard-sketchfab")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("/embed", response.json()["embed_url"])
+        self.assertEqual(response.json()["source_url"], "https://skfb.ly/6R7wy")
 
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})

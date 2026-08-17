@@ -228,6 +228,16 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("WAITING FOR LAIMBURG DATA", response.text)
         self.assertIn("DATA NOT CONNECTED · REPRESENTATIVE MODEL", response.text)
 
+    def test_sidebar_is_independently_scrollable(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("overflow-y:auto", response.text)
+        self.assertIn("overscroll-behavior:contain", response.text)
+        self.assertIn("scrollbar-gutter:stable", response.text)
+        self.assertIn(".sidebar::-webkit-scrollbar-thumb", response.text)
+        self.assertIn("overflow-y:visible", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

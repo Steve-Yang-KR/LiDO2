@@ -118,3 +118,8 @@ The 3D Vineyard view now contains an interactive intelligence panel beneath the 
 ### Detailed spatial vineyard rendering
 
 The Vineyard intelligence canvas has been enlarged and upgraded from simple circles and lines to a layered spatial scene. The foreground row includes curved trunks, bilateral cordons, vertical shoots, shaped leaves and multi-berry clusters; background rows fade into a cyan point-cloud wireframe. Trellis posts and four wire levels, a sloped trial-block outline, animated scan beam, three pulsing sensor nodes, canopy/terrain fields and a stratified soil cross-section share one coordinate system. The rendering remains procedural and representative rather than photogrammetry or a LiDO field scan.
+
+
+### External Vineyard 3D model
+
+Vineyard mode can display the user-selected Sketchfab model shared at https://skfb.ly/6R7wy through the Representative 3D mesh option. The browser resolves the short URL through Sketchfab oEmbed and loads the returned official embed URL; the original short link remains the fallback and attribution target. Apple and Vineyard use separate iframe elements, so only the crop-appropriate model can be active. Creator and licence details are intentionally delegated to the Sketchfab model page because they could not be reliably resolved from the short URL at build time. The asset is labelled representative and not a LiDO field scan.

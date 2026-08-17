@@ -98,3 +98,8 @@ The representative renderer distinguishes structural variables instead of treati
 ### Connected factor interaction
 
 Apple cultivar, rootstock, training-system and tree-age changes now automatically switch fixed representative mesh modes to the parametric Training-system Twin. The interface reports the active combination and maps each factor to its visible effect. When a user deliberately selects the external realistic or hologram mesh, a warning explains that the fixed asset cannot be reshaped by the selected factors or forecast scenario. Timeline and environmental controls also switch to the parametric renderer before animation so the visual response is observable.
+
+
+## Laimburg viticulture meeting default
+
+The 3D Crop Twin now opens in Vineyard mode for the Laimburg discussion. Chardonnay is the representative default, with selectors for cultivar, trial-block geometry and phenology stage. Apple configuration remains available as a secondary crop and is hidden while Vineyard is active. The meeting view prominently states that Laimburg/LiDO measurements are not connected: geometry is representative, phenology is synthetic and environmental values are open-data proxies. Selecting the pending Laimburg block does not imply access to field data.

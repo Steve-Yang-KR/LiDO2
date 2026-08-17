@@ -186,6 +186,22 @@ class ApiValidationTests(unittest.TestCase):
         self.assertIn("Live factor connection", response.text)
         self.assertIn("Current selection:", response.text)
 
+    def test_viticulture_meeting_mode_is_the_default(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Laimburg viticulture discussion mode", response.text)
+        self.assertIn('<option value="vineyard" selected>Vineyard</option>', response.text)
+        self.assertIn('id="vineyardTwinCultivar"', response.text)
+        self.assertIn('id="vineyardTwinBlock"', response.text)
+        self.assertIn('id="vineyardTwinStage"', response.text)
+        self.assertIn("Chardonnay · representative", response.text)
+        self.assertIn("LAIMBURG / LiDO DATA — NOT CONNECTED", response.text)
+        self.assertIn("VINEYARD PARAMETRIC TWIN", response.text)
+        self.assertIn("syncCropControlVisibility", response.text)
+        self.assertIn("VINEYARD_CULTIVARS", response.text)
+        self.assertIn("VINEYARD_STAGES", response.text)
+
     def test_default_scenario_endpoint(self) -> None:
         response = self.client.post("/api/scenarios/evaluate", json={})
         payload = response.json()

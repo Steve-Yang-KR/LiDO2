@@ -56,7 +56,7 @@ async def health() -> dict[str, str | bool]:
     }
 
 
-VINEYARD_SKETCHFAB_SHORT_URL = "https://skfb.ly/6R7wy"
+VINEYARD_SKETCHFAB_SHORT_URL = "https://skfb.ly/pwWWD"
 SKETCHFAB_OEMBED_URL = "https://sketchfab.com/oembed"
 
 

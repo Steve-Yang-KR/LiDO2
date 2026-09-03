@@ -344,6 +344,29 @@ class ApiValidationTests(unittest.TestCase):
         response = self.client.get("/api/open-data/environment?start_date=2026-07-01")
         self.assertEqual(response.status_code, 422)
 
+    def test_github_pages_uses_render_api_origin(self) -> None:
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("location.hostname.endsWith('.github.io')", response.text)
+        self.assertIn("https://lido2.onrender.com", response.text)
+        self.assertIn("function apiUrl(path)", response.text)
+
+    def test_render_api_allows_github_pages_origin(self) -> None:
+        response = self.client.options(
+            "/api/open-data/environment",
+            headers={
+                "Origin": "https://steve-yang-kr.github.io",
+                "Access-Control-Request-Method": "GET",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers.get("access-control-allow-origin"),
+            "https://steve-yang-kr.github.io",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -846,16 +846,18 @@ const titles={home:['Platform overview','Explore wider lifecycle dimensions and 
 nav.forEach(b=>b.addEventListener('click',()=>{nav.forEach(x=>x.classList.remove('active'));views.forEach(x=>x.classList.remove('active'));b.classList.add('active');const id=b.dataset.view;document.getElementById(id).classList.add('active');pageTitle.textContent=titles[id][0];pageSub.textContent=titles[id][1];window.scrollTo({top:0,left:0,behavior:'auto'});document.querySelector('.main').scrollTop=0}));
 
 const globalApiHealthEl=document.getElementById('globalApiHealth');
+const API_ORIGIN=location.hostname.endsWith('.github.io')?'https://lido2.onrender.com':'';
+function apiUrl(path){return /^https?:\/\//.test(path)?path:API_ORIGIN+path}
 function setGlobalApiState(state,detail){
  globalApiHealthEl.className='api-health '+state;
  globalApiHealthEl.textContent=state==='connected'?'Python API connected':state==='disconnected'?'Python API unavailable':'API checking';
  globalApiHealthEl.title=detail||'';
 }
 async function fetchJson(url,options){
- const response=await fetch(url,options);
- const body=await response.text();
+ const requestUrl=apiUrl(url),response=await fetch(requestUrl,options);
+ const body=await response.text(),contentType=response.headers.get('content-type')||'unknown';
  let payload=null;
- if(body){try{payload=JSON.parse(body)}catch(error){throw new Error('Invalid JSON response from '+url)}}
+ if(body){try{payload=JSON.parse(body)}catch(error){throw new Error('API returned HTTP '+response.status+' as '+contentType+' from '+requestUrl)}}
  return {response,payload};
 }
 async function probeApiHealth(){

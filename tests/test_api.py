@@ -255,16 +255,17 @@ class ApiValidationTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn('id="vineyardMeshFrame"', response.text)
-        self.assertIn("https://skfb.ly/pwWWD", response.text)
-        self.assertIn("resolveVineyardSketchfabModel", response.text)
-        self.assertIn("/api/models/vineyard-sketchfab", response.text)
+        self.assertIn("a7b3cf45d3e94e9da189da78aa7d8657/embed", response.text)
+        self.assertIn('data-resolved="true"', response.text)
+        self.assertIn("Vineyard by Buncic on Sketchfab", response.text)
+        self.assertIn("reloadVineyardSketchfabModel", response.text)
+        self.assertNotIn("resolveVineyardSketchfabModel", response.text)
+        self.assertNotIn("fetch('/api/models/vineyard-sketchfab'", response.text)
         self.assertIn("active-mesh-frame", response.text)
         self.assertIn("VINEYARD 3D MODEL ACTIVE", response.text)
         self.assertIn("creator and licence shown by Sketchfab", response.text)
-        self.assertNotIn("vineyardMeshFrame.src=shortUrl", response.text)
         self.assertIn("vineyard-mesh-failed", response.text)
         self.assertIn('id="retryVineyardModel"', response.text)
-        self.assertIn("cache:\'no-store\'", response.text)
 
     def test_sketchfab_oembed_parser_accepts_protocol_relative_embed(self) -> None:
         payload = {

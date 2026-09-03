@@ -9,6 +9,7 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import httpx
 from fastapi import FastAPI, HTTPException, Query, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from scenario_engine import ScenarioInput, ScenarioResult, evaluate_scenario
@@ -24,6 +25,17 @@ app = FastAPI(
     version="2.4.0",
     docs_url="/api/docs",
     redoc_url=None,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://steve-yang-kr.github.io",
+        "https://lido2.onrender.com",
+    ],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Accept", "Content-Type"],
 )
 
 
